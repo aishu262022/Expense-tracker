@@ -26,7 +26,7 @@ A comprehensive MERN stack application for personal financial management with re
 - **Node.js** with Express.js
 - **MongoDB** with Mongoose ODM
 - **Express-Session** with connect-mongo for persistent sessions
-- **Socket.IO** for real-time communication
+  
 
 ### Frontend
 - **Vanilla JavaScript** with modern ES6+ features
@@ -280,3 +280,4 @@ For issues and questions:
 ---
 
 **Happy Financial Management! 💰**
+
