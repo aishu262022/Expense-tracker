@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pockit – Savings Goals</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Inter:wght@400;600&family=Montserrat:wght@700&display=swap" rel="stylesheet"/>
+  <script src="js/theme.js"></script>
+  <style>
+    /* User Profile Dropdown */
+    .user-profile-dropdown { position: relative; }
+    .dropdown-menu { position: absolute; top: 100%; right: 0; margin-top: 8px; background: #fff; border-radius: 12px; box-shadow: 0 8px 32px rgba(44,62,80,0.12); min-width: 280px; z-index: 1000; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; border: 1px solid #F0F0F0; }
+    .dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
+    .dropdown-header { padding: 20px; display: flex; align-items: center; gap: 12px; }
+    .dropdown-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #00BFFF 60%, #1DE9B6 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; }
+    .dropdown-user-info { flex: 1; }
+    .dropdown-name { font-size: 1.1rem; font-weight: 700; color: #2C3E50; margin-bottom: 4px; }
+    .dropdown-email { font-size: 0.95rem; color: #7B8A97; }
+    .dropdown-divider { height: 1px; background: #F0F0F0; margin: 0; }
+    .dropdown-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: #2C3E50; text-decoration: none; font-size: 1rem; font-weight: 500; transition: background 0.2s; border: none; background: none; width: 100%; text-align: left; cursor: pointer; }
+    .dropdown-item:hover { background: #F8F9FA; color: #00BFFF; }
+    .dropdown-item.logout-item:hover { background: #FFF5F5; color: #FF5A5A; }
+    .dropdown-icon { font-size: 1.1rem; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #0056A8; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: background 0.2s, transform 0.2s; }
+    .user-avatar:hover { background: #004080; transform: scale(1.05); }
+    
+    /* Unified Top Bar Layout */
+    .top-bar { display: flex; align-items: center; justify-content: flex-end; gap: 1rem; margin-right: 2rem; margin-top: 1rem; }
+    .add-btn { background: #00BFFF; color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 1.08rem; padding: 10px 28px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,191,255,0.08); transition: background 0.18s; }
+    .add-btn:hover { background: #1DE9B6; color: #2C3E50; }
+    
+    @media (max-width: 700px) {
+      .dropdown-menu { min-width: 260px; right: -10px; }
+      .savings-header-right { gap: 12px; }
+    }
+
+    .last-updated {
+      font-size: 0.9rem;
+      color: #7B8A97;
+      text-align: right;
+      line-height: 1.3;
+    }
+
+    /* Celebration Styles */
+    .goal-congrats {
+      animation: celebrationPulse 0.6s ease-in-out;
+      transform: scale(0.8);
+      animation-fill-mode: forwards;
+    }
+
+    @keyframes celebrationPulse {
+      0% { transform: scale(0.8); opacity: 0; }
+      50% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .confetti-canvas {
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    /* Goal Status Indicator Animation */
+    .savings-goal-header span:last-child {
+      animation: statusFadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes statusFadeIn {
+      0% { opacity: 0; transform: translateX(-10px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Enhanced transitions for dark mode */
+    body.dark-mode * {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* Dark Mode Styles for Savings Page */
+    body.dark-mode .dashboard-container {
+      background: #121212;
+    }
+
+    body.dark-mode .savings-main {
+      background: #121212;
+    }
+
+    body.dark-mode .savings-header-title {
+      color: #ffffff;
+    }
+
+    body.dark-mode .savings-header-sub {
+      color: #b0b0b0;
+    }
+
+    body.dark-mode .savings-total {
+      color: #00BFFF;
+    }
+
+    /* Summary Cards Dark Mode */
+    body.dark-mode .savings-summary-card {
+      background: #2d2d44 !important;
+      border: 1px solid #555 !important;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3) !important;
+    }
+
+    body.dark-mode .savings-summary-title {
+      color: #b0b0b0 !important;
+    }
+
+    body.dark-mode .savings-summary-value {
+      color: #ffffff !important;
+    }
+
+    body.dark-mode .savings-summary-value.blue {
+      color: #00BFFF !important;
+    }
+
+    body.dark-mode .savings-summary-label {
+      color: #b0b0b0 !important;
+    }
+
+    /* Savings Tips Dark Mode */
+    body.dark-mode .savings-tips-card {
+      background: #2d2d44 !important;
+      border: 1px solid #555 !important;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3) !important;
+    }
+
+    body.dark-mode .savings-tips-title {
+      color: #ffffff !important;
+    }
+
+    body.dark-mode .savings-tips-desc {
+      color: #b0b0b0 !important;
+    }
+
+    body.dark-mode .savings-tip {
+      background: #3a3a4a !important;
+      color: #e0e0e0 !important;
+      border: 1px solid #555 !important;
+    }
+
+    body.dark-mode .savings-tips-btn {
+      background: #3a3a4a !important;
+      color: #e0e0e0 !important;
+      border: 1px solid #555 !important;
+    }
+
+    body.dark-mode .savings-tips-btn:hover {
+      background: #4a4a5a !important;
+      color: #00BFFF !important;
+    }
+
+    body.dark-mode .savings-tips-page {
+      color: #b0b0b0 !important;
+    }
+
+    /* Modal Dark Mode */
+    body.dark-mode .savings-modal-overlay {
+      background: rgba(0, 0, 0, 0.7) !important;
+    }
+
+    body.dark-mode .savings-modal-content {
+      background: #2d2d44 !important;
+      border: 1px solid #555 !important;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.5) !important;
+    }
+
+    body.dark-mode .savings-modal-title {
+      color: #00BFFF !important;
+    }
+
+    body.dark-mode .savings-modal-label {
+      color: #ffffff !important;
+    }
+
+    body.dark-mode .savings-modal-input {
+      background: #3a3a4a !important;
+      color: #ffffff !important;
+      border-color: #555 !important;
+    }
+
+    body.dark-mode .savings-modal-input:focus {
+      background: #4a4a5a !important;
+      border-color: #00BFFF !important;
+      box-shadow: 0 0 0 2px rgba(0, 191, 255, 0.2) !important;
+    }
+
+    body.dark-mode .savings-modal-input::placeholder {
+      color: #888888 !important;
+    }
+
+    body.dark-mode .savings-modal-cancel-btn {
+      background: #3a3a4a !important;
+      color: #e0e0e0 !important;
+      border: 1px solid #555 !important;
+    }
+
+    body.dark-mode .savings-modal-cancel-btn:hover {
+      background: #4a4a5a !important;
+      color: #00BFFF !important;
+    }
+
+    body.dark-mode .savings-modal-submit-btn {
+      background: #00BFFF !important;
+      color: #ffffff !important;
+    }
+
+    body.dark-mode .savings-modal-submit-btn:hover {
+      background: #1DE9B6 !important;
+    }
+
+    /* Savings Goals Grid Dark Mode */
+    body.dark-mode .savings-goals-grid {
+      background: transparent;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">P</div>
+        <div class="sidebar-title">Pockit</div>
+      </div>
+      <hr style="border:none;border-top:1.5px solid #F0F0F0;margin:0 18px 0 18px;">
+      <div style="font-size:0.98rem;color:#7B8A97;font-weight:600;padding:18px 0 6px 28px;letter-spacing:0.5px;">Menu</div>
+      <nav class="sidebar-menu">
+        <a href="dashboard.html" class="sidebar-link"><span class="icon">🏠</span>Dashboard</a>
+        <a href="expense.html" class="sidebar-link"><span class="icon">💸</span>Expenses</a>
+        <a href="emi.html" class="sidebar-link"><span class="icon">📅</span>EMI Manager</a>
+        <a href="debt.html" class="sidebar-link"><span class="icon">📊</span>Debt Tracker</a>
+        <a href="savings.html" class="sidebar-link active"><span class="icon">🎯</span>Savings Goals</a>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-logout">
+        <button class="logout-btn" onclick="handleLogout()">Logout</button>
+      </div>
+    </aside>
+    <!-- Main Section -->
+    <main class="savings-main">
+      <!-- Header -->
+      <div class="savings-header">
+        <div class="savings-header-left">
+          <div class="savings-header-title"><span class="icon">🎯</span>Savings Goals</div>
+          <div class="savings-header-sub">Set and achieve your financial dreams</div>
+        </div>
+        <div class="savings-header-right">
+          <div class="savings-total">Total Saved ₹10,500</div>
+          <div class="top-bar">
+            <button class="add-btn" id="addSavingsBtn">Add New Goal</button>
+            <div class="user-profile-dropdown">
+              <div class="user-avatar" id="userAvatar" onclick="toggleDropdown()">JD</div>
+              <div class="dropdown-menu" id="dropdownMenu">
+                <div class="dropdown-header">
+                  <div class="dropdown-avatar" id="dropdownAvatar">JD</div>
+                  <div class="dropdown-user-info">
+                    <div class="dropdown-name" id="dropdownName">John Doe</div>
+                    <div class="dropdown-email" id="dropdownEmail">john@example.com</div>
+                  </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                <a href="profile.html" class="dropdown-item">
+                  <span class="dropdown-icon">👤</span>
+                  View Profile
+                </a>
+                <a href="settings.html" class="dropdown-item">
+                  <span class="dropdown-icon">⚙️</span>
+                  Settings
+                </a>
+                <div class="dropdown-divider"></div>
+                <button class="dropdown-item logout-item" onclick="handleLogout()">
+                  <span class="dropdown-icon">🚪</span>
+                  Log out
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Summary Row -->
+      <div class="savings-summary-row" style="display:flex;gap:24px;margin:32px 0 18px 0;flex-wrap:wrap;">
+        <div class="savings-summary-card" id="totalSavingsCard" style="flex:1;min-width:220px;background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(44,62,80,0.07);padding:24px 24px 18px 24px;display:flex;flex-direction:column;gap:8px;">
+          <div class="savings-summary-title" style="font-size:1.08rem;color:#7B8A97;font-weight:600;">Total Savings</div>
+          <div class="savings-summary-value" id="totalSavingsValue" style="font-size:1.7rem;font-weight:700;color:#2C3E50;margin:2px 0 0 0;">₹0</div>
+          <div class="savings-summary-label" style="font-size:0.98rem;color:#7B8A97;">Sum of all plans</div>
+        </div>
+        <div class="savings-summary-card" id="plansCard" style="flex:1;min-width:220px;background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(44,62,80,0.07);padding:24px 24px 18px 24px;display:flex;flex-direction:column;gap:8px;">
+          <div class="savings-summary-title" style="font-size:1.08rem;color:#7B8A97;font-weight:600;">Plans</div>
+          <div class="savings-summary-value" id="plansValue" style="font-size:1.7rem;font-weight:700;color:#00BFFF;margin:2px 0 0 0;">0</div>
+          <div class="savings-summary-label" style="font-size:0.98rem;color:#7B8A97;">Active savings plans</div>
+        </div>
+      </div>
+      <!-- Goals Grid -->
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+        
+      </div>
+      <div class="savings-goals-grid" id="savingsGoalsGrid">
+        <!-- Dynamic savings goals will be rendered here -->
+      </div>
+      <!-- Add Savings Modal -->
+      <div id="savingsModal" class="savings-modal-overlay" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);z-index:1000;justify-content:center;align-items:center;">
+        <div class="savings-modal-content" style="background:#fff;padding:28px 28px 18px 28px;border-radius:16px;min-width:320px;max-width:95vw;box-shadow:0 4px 24px rgba(44,62,80,0.13);">
+          <h2 class="savings-modal-title" style="margin-bottom:12px;color:#00BFFF;">Add Savings Goal</h2>
+          <form id="savingsForm">
+            <label class="savings-modal-label" style="font-weight:600;">Savings For</label><br/>
+            <input type="text" id="savingsFor" class="savings-modal-input" required style="width:100%;padding:10px;margin-bottom:12px;border:1px solid #ccc;border-radius:6px;"><br/>
+            <label class="savings-modal-label" style="font-weight:600;">Total Amount</label><br/>
+            <input type="number" id="savingsAmount" class="savings-modal-input" required min="1" style="width:100%;padding:10px;margin-bottom:12px;border:1px solid #ccc;border-radius:6px;"><br/>
+            <label class="savings-modal-label" style="font-weight:600;">Target Date</label><br/>
+            <input type="date" id="savingsDate" class="savings-modal-input" required style="width:100%;padding:10px;margin-bottom:12px;border:1px solid #ccc;border-radius:6px;"><br/>
+            <button type="submit" class="savings-modal-submit-btn" style="background:#00BFFF;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;">Add</button>
+            <button type="button" id="closeSavingsModal" class="savings-modal-cancel-btn" style="margin-left:10px;background:#ccc;color:#333;border:none;padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;">Cancel</button>
+          </form>
+        </div>
+      </div>
+      <!-- Smart Savings Tips -->
+      <div class="savings-tips-card">
+        <div class="savings-tips-header">
+          <span class="savings-tips-icon">💡</span>
+          <span class="savings-tips-title">Smart Savings Tips</span>
+        </div>
+        <div class="savings-tips-desc">Personalized tips to boost your savings</div>
+        <div class="savings-tip">Try the 50/30/20 rule: 50% needs, 30% wants, 20% savings.</div>
+        <div class="savings-tips-actions">
+          <button class="savings-tips-btn">Previous Tip</button>
+          <span class="savings-tips-page">1 of 4</span>
+          <button class="savings-tips-btn">Next Tip</button>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="js/main.js"></script>
+  <script>
+    // Dropdown functionality
+    function toggleDropdown() {
+      const dropdown = document.getElementById('dropdownMenu');
+      dropdown.classList.toggle('show');
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+      const dropdown = document.getElementById('dropdownMenu');
+      const avatar = document.getElementById('userAvatar');
+      
+      if (!dropdown.contains(event.target) && !avatar.contains(event.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+
+    // Close dropdown on escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        const dropdown = document.getElementById('dropdownMenu');
+        dropdown.classList.remove('show');
+      }
+    });
+
+    // Authentication check - redirect to login if not authenticated
+    window.addEventListener('DOMContentLoaded', async function() {
+      const storedUser = localStorage.getItem('user');
+      if (!storedUser || storedUser === 'null' || storedUser === 'undefined') {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      try {
+        let userData;
+        try {
+          // First try to get user from localStorage
+          userData = JSON.parse(storedUser);
+          
+          // Optionally try to fetch fresh data from server (but don't fail if it doesn't work)
+          try {
+            const res = await fetch('/api/current-user');
+            if (res.ok) {
+              const serverUser = await res.json();
+              // Update localStorage with fresh data
+              localStorage.setItem('user', JSON.stringify(serverUser));
+              userData = serverUser;
+            }
+          } catch (serverError) {
+            // If server request fails, continue with localStorage data
+            console.log('Using cached user data');
+          }
+        } catch (parseError) {
+          console.error('Failed to parse stored user data:', parseError);
+          localStorage.removeItem('user');
+          window.location.href = 'login.html';
+          return;
+        }
+
+        // Generate initials
+        const initials = userData.name.split(' ').map(n => n[0]).join('');
+        
+        // Update avatars and user info
+        document.getElementById('userAvatar').textContent = initials;
+        document.getElementById('dropdownAvatar').textContent = initials;
+        document.getElementById('dropdownName').textContent = userData.name;
+        document.getElementById('dropdownEmail').textContent = userData.email;
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+      }
+    });
+
+    // Logout function
+    async function handleLogout() {
+      try {
+        const response = await fetch('/api/logout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        localStorage.removeItem('user');
+        window.location.href = 'login.html?logout=true';
+      } catch (error) {
+        console.error('Logout error:', error);
+        localStorage.removeItem('user');
+        window.location.href = 'login.html?logout=true';
+      }
+    }
+
+    // Update logout button to use the logout function
+    document.addEventListener('DOMContentLoaded', function() {
+      const logoutBtn = document.querySelector('.logout-btn');
+      if (logoutBtn) {
+        logoutBtn.onclick = handleLogout;
+      }
+    });
+  </script>
+</body>
+</html>

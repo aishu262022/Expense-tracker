@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pockit – Debt Tracker</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Inter:wght@400;600&family=Montserrat:wght@700&display=swap" rel="stylesheet"/>
+  <script src="js/theme.js"></script>
+  <style>
+    .dashboard-container { display: flex; min-height: 100vh; background: #F9FBF4; }
+    .sidebar { width: 240px; background: #fff; box-shadow: 2px 0 12px rgba(44,62,80,0.04); display: flex; flex-direction: column; align-items: stretch; padding: 0; }
+    .sidebar-header { display: flex; align-items: center; gap: 12px; padding: 32px 24px 24px 24px; }
+    .sidebar-logo { width: 38px; height: 38px; border-radius: 12px; background: linear-gradient(135deg, #00BFFF 60%, #1DE9B6 100%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #fff; font-weight: 700; }
+    .sidebar-title { font-size: 1.35rem; font-weight: 700; color: #00BFFF; font-family: 'Montserrat',sans-serif; }
+    .sidebar-menu { display: flex; flex-direction: column; gap: 4px; margin-top: 0; }
+    .sidebar-link { display: flex; align-items: center; gap: 12px; padding: 12px 28px; font-size: 1.08rem; color: #2C3E50; text-decoration: none; border-radius: 8px 0 0 8px; font-weight: 500; transition: background 0.15s, color 0.15s; }
+    .sidebar-link.active { background: #E3F0FF; color: #1976D2; font-weight: 700; }
+    .sidebar-link .icon { font-size: 1.2rem; }
+    .sidebar-link:hover:not(.active) { background: #F2FAFF; color: #00BFFF; }
+    .sidebar-spacer { flex: 1; }
+    .sidebar-logout { margin: 24px 0 24px 0; text-align: center; }
+    .logout-btn { background: #fff; color: #00BFFF; border: 1.5px solid #00BFFF; border-radius: 8px; padding: 8px 24px; font-weight: 600; cursor: pointer; transition: background 0.15s, color 0.15s; }
+    .logout-btn:hover { background: #00BFFF; color: #fff; }
+    @media (max-width: 1100px) {
+      .sidebar { width: 100px; }
+      .sidebar-title { display: none; }
+      .sidebar-link { padding: 12px 10px; font-size: 0.98rem; }
+    }
+    @media (max-width: 700px) {
+      .dashboard-container { flex-direction: column; }
+      .sidebar { width: 100%; flex-direction: row; height: 60px; box-shadow: 0 2px 12px rgba(44,62,80,0.07); }
+      .sidebar-header, .sidebar-spacer, .sidebar-logout { display: none; }
+      .sidebar-menu { flex-direction: row; gap: 0; margin: 0; width: 100%; justify-content: space-around; }
+      .sidebar-link { border-radius: 0; padding: 10px 0; justify-content: center; width: 100%; }
+    }
+    .debt-main { flex: 1; padding: 36px 36px 24px 36px; }
+    .debt-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
+    .debt-header-left { }
+    .debt-header-title { font-size: 1.6rem; font-weight: 700; color: #2C3E50; margin-bottom: 4px; display: flex; align-items: center; gap: 10px; }
+    .debt-header-title .icon { font-size: 1.3rem; }
+    .debt-header-sub { color: #7B8A97; font-size: 1.08rem; }
+    .debt-header-right { display: flex; align-items: center; gap: 24px; }
+    .debt-total { color: #FF5A5A; font-size: 1.15rem; font-weight: 700; margin-left: 12px; }
+    
+    /* Unified Top Bar Layout */
+    .top-bar { display: flex; align-items: center; justify-content: flex-end; gap: 1rem; margin-right: 2rem; margin-top: 1rem; }
+    .add-btn { background: #00BFFF; color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 1.08rem; padding: 10px 28px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,191,255,0.08); transition: background 0.18s; }
+    .add-btn:hover { background: #1DE9B6; color: #2C3E50; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #0056A8; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: background 0.2s, transform 0.2s; }
+    .user-avatar:hover { background: #004080; transform: scale(1.05); }
+    
+    /* User Profile Dropdown */
+    .user-profile-dropdown { position: relative; }
+    .dropdown-menu { position: absolute; top: 100%; right: 0; margin-top: 8px; background: #fff; border-radius: 12px; box-shadow: 0 8px 32px rgba(44,62,80,0.12); min-width: 280px; z-index: 1000; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; border: 1px solid #F0F0F0; }
+    .dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
+    .dropdown-header { padding: 20px; display: flex; align-items: center; gap: 12px; }
+    .dropdown-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #00BFFF 60%, #1DE9B6 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; }
+    .dropdown-user-info { flex: 1; }
+    .dropdown-name { font-size: 1.1rem; font-weight: 700; color: #2C3E50; margin-bottom: 4px; }
+    .dropdown-email { font-size: 0.95rem; color: #7B8A97; }
+    .dropdown-divider { height: 1px; background: #F0F0F0; margin: 0; }
+    .dropdown-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: #2C3E50; text-decoration: none; font-size: 1rem; font-weight: 500; transition: background 0.2s; border: none; background: none; width: 100%; text-align: left; cursor: pointer; }
+    .dropdown-item:hover { background: #F8F9FA; color: #00BFFF; }
+    .dropdown-item.logout-item:hover { background: #FFF5F5; color: #FF5A5A; }
+    .dropdown-icon { font-size: 1.1rem; }
+    .debt-summary-row { display: flex; gap: 24px; margin-bottom: 24px; }
+    .debt-summary-card { flex: 1; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(44,62,80,0.07); padding: 24px 24px 18px 24px; display: flex; flex-direction: column; gap: 8px; min-width: 180px; }
+    .debt-summary-title { font-size: 1.08rem; color: #7B8A97; font-weight: 600; }
+    .debt-summary-value { font-size: 1.7rem; font-weight: 700; color: #2C3E50; margin: 2px 0 0 0; }
+    .debt-summary-value.red { color: #FF5A5A; }
+    .debt-summary-label { font-size: 0.98rem; color: #7B8A97; }
+    .debt-summary-value.yellow { color: #FFC107; }
+    .debt-add-btn { background: #00BFFF; color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 1.08rem; padding: 10px 28px; cursor: pointer; margin-left: 18px; box-shadow: 0 2px 8px rgba(0,191,255,0.08); transition: background 0.18s; }
+    .debt-add-btn:hover { background: #1DE9B6; color: #2C3E50; }
+    .debt-list-section { margin-top: 8px; }
+    .debt-card { background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(44,62,80,0.07); padding: 24px 24px 18px 24px; margin-bottom: 18px; display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+    .debt-card-details { flex: 1; min-width: 220px; }
+    .debt-card-title { font-size: 1.15rem; font-weight: 700; color: #2C3E50; margin-bottom: 4px; }
+    .debt-card-sub { font-size: 1.02rem; color: #7B8A97; margin-bottom: 8px; }
+    .debt-progress-bar-bg { background: #F0F0F0; border-radius: 8px; height: 8px; width: 100%; margin-bottom: 8px; }
+    .debt-progress-bar { background: #00BFFF; height: 8px; border-radius: 8px; }
+    .debt-card-row { display: flex; align-items: center; gap: 18px; margin-bottom: 6px; flex-wrap: wrap; }
+    .debt-badge { background: #FFEBEE; color: #FF5A5A; border-radius: 8px; padding: 4px 14px; font-size: 0.98rem; font-weight: 600; margin-bottom: 8px; display: inline-block; }
+    .debt-total-amount { font-size: 1.08rem; color: #2C3E50; font-weight: 600; margin-bottom: 8px; }
+    .debt-pay-btn { background: #1DE9B6; color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 1.08rem; padding: 10px 24px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,191,255,0.08); transition: background 0.18s; margin-right: 8px; }
+    .debt-pay-btn:hover { background: #00BFFF; color: #fff; }
+    .debt-custom-btn { background: #ECECEC; color: #2C3E50; border: none; border-radius: 8px; font-weight: 700; font-size: 1.08rem; padding: 10px 24px; cursor: pointer; box-shadow: 0 2px 8px rgba(44,62,80,0.04); transition: background 0.18s; }
+    .debt-custom-btn:hover { background: #F2FAFF; color: #00BFFF; }
+    @media (max-width: 1100px) {
+      .debt-summary-row { flex-direction: column; gap: 18px; }
+      .debt-main { padding: 24px 8px; }
+      .debt-card { flex-direction: column; gap: 12px; }
+    }
+    @media (max-width: 700px) {
+      .debt-main { padding: 12px 2vw; }
+      .dropdown-menu { min-width: 260px; right: -10px; }
+      .debt-header-right { gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">P</div>
+        <div class="sidebar-title">Pockit</div>
+      </div>
+      <hr style="border:none;border-top:1.5px solid #F0F0F0;margin:0 18px 0 18px;">
+      <div style="font-size:0.98rem;color:#7B8A97;font-weight:600;padding:18px 0 6px 28px;letter-spacing:0.5px;">Menu</div>
+      <nav class="sidebar-menu">
+        <a href="dashboard.html" class="sidebar-link"><span class="icon">🏠</span>Dashboard</a>
+        <a href="expense.html" class="sidebar-link"><span class="icon">💸</span>Expenses</a>
+        <a href="emi.html" class="sidebar-link"><span class="icon">📅</span>EMI Manager</a>
+        <a href="#" class="sidebar-link active"><span class="icon">📊</span>Debt Tracker</a>
+        <a href="savings.html" class="sidebar-link"><span class="icon">🎯</span>Savings Goals</a>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-logout">
+        <button class="logout-btn" onclick="handleLogout()">Logout</button>
+      </div>
+    </aside>
+    <!-- Main Section -->
+    <main class="debt-main">
+      <!-- Header -->
+      <div class="debt-header">
+        <div class="debt-header-left">
+          <div class="debt-header-title"><span class="icon">💳</span>Debt Tracker</div>
+          <div class="debt-header-sub">Monitor and pay down your debts</div>
+        </div>
+        <div class="debt-header-right">
+          <div class="debt-total" id="debtTotal">Total Outstanding ₹0</div>
+          <div class="top-bar">
+            <button class="add-btn" id="addDebtBtn">Add New Debt</button>
+            <div class="user-profile-dropdown">
+              <div class="user-avatar" id="userAvatar" onclick="toggleDropdown()">JD</div>
+              <div class="dropdown-menu" id="dropdownMenu">
+                <div class="dropdown-header">
+                  <div class="dropdown-avatar" id="dropdownAvatar">JD</div>
+                  <div class="dropdown-user-info">
+                    <div class="dropdown-name" id="dropdownName">John Doe</div>
+                    <div class="dropdown-email" id="dropdownEmail">john@example.com</div>
+                  </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                <a href="profile.html" class="dropdown-item">
+                  <span class="dropdown-icon">👤</span>
+                  View Profile
+                </a>
+                <a href="settings.html" class="dropdown-item">
+                  <span class="dropdown-icon">⚙️</span>
+                  Settings
+                </a>
+                <div class="dropdown-divider"></div>
+                <button class="dropdown-item logout-item" onclick="handleLogout()">
+                  <span class="dropdown-icon">🚪</span>
+                  Log out
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Summary Cards -->
+      <div class="debt-summary-row">
+        <div class="debt-summary-card">
+          <div class="debt-summary-title">Active Debts</div>
+          <div class="debt-summary-value" id="debtCount">0</div>
+          <div class="debt-summary-label">Outstanding loans</div>
+        </div>
+        <div class="debt-summary-card">
+          <div class="debt-summary-title">Monthly Minimum</div>
+          <div class="debt-summary-value red" id="debtMonthlyMin">₹0</div>
+          <div class="debt-summary-label">Required payments</div>
+        </div>
+        <div class="debt-summary-card">
+          <div class="debt-summary-title">Avg Interest</div>
+          <div class="debt-summary-value yellow" id="debtAvgInterest">0%</div>
+          <div class="debt-summary-label">Weighted average</div>
+        </div>
+      </div>
+      <!-- Debt List -->
+      <div class="debt-list-section" id="debtListSection">
+        <!-- Debt cards will be rendered here by JS -->
+      </div>
+      <!-- Add Debt Modal -->
+      <div id="debtModal" style="display:none;position:fixed;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);align-items:center;justify-content:center;z-index:100;">
+        <form id="debtForm" style="background:#fff;padding:32px 28px 24px 28px;border-radius:16px;box-shadow:0 4px 32px rgba(44,62,80,0.13);min-width:320px;display:flex;flex-direction:column;gap:18px;">
+          <div style="font-size:1.2rem;font-weight:700;color:#2C3E50;margin-bottom:8px;">Add New Debt</div>
+          <input id="debtName" type="text" placeholder="Bank or Person" required style="padding:10px 12px;border-radius:8px;border:1.5px solid #E0E0E0;">
+          <input id="debtAmount" type="number" min="1" placeholder="Total Amount" required style="padding:10px 12px;border-radius:8px;border:1.5px solid #E0E0E0;">
+          <input id="debtDue" type="date" required style="padding:10px 12px;border-radius:8px;border:1.5px solid #E0E0E0;">
+          <input id="debtInterest" type="number" min="0" max="100" step="0.01" placeholder="Interest Rate (%)" style="padding:10px 12px;border-radius:8px;border:1.5px solid #E0E0E0;">
+          <input id="debtMinPayment" type="number" min="1" placeholder="Monthly Minimum Payment" style="padding:10px 12px;border-radius:8px;border:1.5px solid #E0E0E0;">
+          <div style="display:flex;gap:12px;justify-content:flex-end;">
+            <button type="button" id="closeDebtModal" style="background:#ECECEC;color:#2C3E50;border:none;border-radius:8px;padding:8px 18px;font-weight:600;">Cancel</button>
+            <button type="submit" style="background:#00BFFF;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-weight:700;">Add</button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+  <script src="js/main.js"></script>
+  <script>
+    // Dropdown functionality
+    function toggleDropdown() {
+      const dropdown = document.getElementById('dropdownMenu');
+      dropdown.classList.toggle('show');
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+      const dropdown = document.getElementById('dropdownMenu');
+      const avatar = document.getElementById('userAvatar');
+      
+      if (!dropdown.contains(event.target) && !avatar.contains(event.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+
+    // Close dropdown on escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        const dropdown = document.getElementById('dropdownMenu');
+        dropdown.classList.remove('show');
+      }
+    });
+
+    // Authentication check - redirect to login if not authenticated
+    window.addEventListener('DOMContentLoaded', async function() {
+      const storedUser = localStorage.getItem('user');
+      if (!storedUser || storedUser === 'null' || storedUser === 'undefined') {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      try {
+        let userData;
+        try {
+          // First try to get user from localStorage
+          userData = JSON.parse(storedUser);
+          
+          // Optionally try to fetch fresh data from server (but don't fail if it doesn't work)
+          try {
+            const res = await fetch('/api/current-user');
+            if (res.ok) {
+              const serverUser = await res.json();
+              // Update localStorage with fresh data
+              localStorage.setItem('user', JSON.stringify(serverUser));
+              userData = serverUser;
+            }
+          } catch (serverError) {
+            // If server request fails, continue with localStorage data
+            console.log('Using cached user data');
+          }
+        } catch (parseError) {
+          console.error('Failed to parse stored user data:', parseError);
+          localStorage.removeItem('user');
+          window.location.href = 'login.html';
+          return;
+        }
+
+        // Generate initials
+        const initials = userData.name.split(' ').map(n => n[0]).join('');
+        
+        // Update avatars and user info
+        document.getElementById('userAvatar').textContent = initials;
+        document.getElementById('dropdownAvatar').textContent = initials;
+        document.getElementById('dropdownName').textContent = userData.name;
+        document.getElementById('dropdownEmail').textContent = userData.email;
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+      }
+    });
+
+    // Logout function
+    async function handleLogout() {
+      try {
+        const response = await fetch('/api/logout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        localStorage.removeItem('user');
+        window.location.href = 'login.html?logout=true';
+      } catch (error) {
+        console.error('Logout error:', error);
+        localStorage.removeItem('user');
+        window.location.href = 'login.html?logout=true';
+      }
+    }
+
+    // Update logout button to use the logout function
+    document.addEventListener('DOMContentLoaded', function() {
+      const logoutBtn = document.querySelector('.logout-btn');
+      if (logoutBtn) {
+        logoutBtn.onclick = handleLogout;
+      }
+    });
+  </script>
+</body>
+</html>

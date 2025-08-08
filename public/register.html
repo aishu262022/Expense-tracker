@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pockit – Register</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Inter:wght@400;600&family=Montserrat:wght@700&display=swap" rel="stylesheet"/>
+  <script src="js/theme.js"></script>
+  <style>
+    /* Toast Notification Styles */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      padding: 16px 20px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      z-index: 1000;
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+      max-width: 300px;
+    }
+    .toast.show {
+      transform: translateX(0);
+    }
+    .toast.success {
+      border-left: 4px solid #1DE9B6;
+      color: #2C3E50;
+    }
+    .toast.error {
+      border-left: 4px solid #FF5A5A;
+      color: #2C3E50;
+    }
+    .toast.warning {
+      border-left: 4px solid #FFA726;
+      color: #2C3E50;
+    }
+  </style>
+</head>
+<body class="auth-bg">
+  <div class="auth-header">
+    <div class="auth-logo">
+      <span class="auth-logo-p">P</span>
+      <span class="auth-logo-text">Pockit</span>
+    </div>
+    <div class="auth-subtitle">Manage your finances with ease</div>
+  </div>
+  <main>
+    <div class="auth-card">
+      <h2 class="auth-title">Get Started</h2>
+      <div class="auth-subtext">Create an account or sign in to continue</div>
+      <div class="auth-tabs">
+        <a href="/login.html" class="auth-tab">Login</a>
+        <a href="/register.html" class="auth-tab active">Register</a>
+      </div>
+
+
+      <!-- Updated form -->
+      <form class="auth-form" id="registerForm" autocomplete="off">
+        <label for="fullname" class="auth-label">Full Name</label>
+        <input type="text" id="fullname" name="name" class="auth-input" placeholder="John Doe" required />
+
+        <label for="email" class="auth-label">Email</label>
+        <input type="email" id="email" name="email" class="auth-input" placeholder="your@email.com" required />
+
+        <label for="mobile" class="auth-label">Mobile Number</label>
+        <input type="tel" id="mobile" name="mobile" class="auth-input" placeholder="+1" required />
+
+        <label for="occupation" class="auth-label">Occupation</label>
+        <input type="text" id="occupation" name="occupation" class="auth-input" placeholder="Software Engineer" required />
+
+        <label for="salary" class="auth-label">Monthly Salary</label>
+        <input type="number" id="salary" name="salary" class="auth-input" placeholder="5000" required />
+
+        <label for="password" class="auth-label">Password</label>
+        <input type="password" id="password" name="password" class="auth-input" placeholder="Create a strong password" required />
+
+        <label for="confirmpassword" class="auth-label">Confirm Password</label>
+        <input type="password" id="confirmpassword" name="confirmPassword" class="auth-input" placeholder="Confirm your password" required />
+
+        <button type="submit" class="auth-btn">Create Account</button>
+      </form>
+      
+      <div class="auth-link-section">
+        <span class="auth-link-text">Already have an account? </span>
+        <a href="login.html" class="auth-link">Login</a>
+      </div>
+    </div>
+
+    <div class="auth-footer">
+      <a href="/index.html" class="auth-back">&larr; Back to Home</a>
+    </div>
+  </main>
+
+  <script src="/js/auth.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/register.js"></script>
+</body>
+</html>

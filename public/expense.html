@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pockit – Expense Tracker</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Inter:wght@400;600&family=Montserrat:wght@700&display=swap" rel="stylesheet"/>
+  <script src="js/theme.js"></script>
+  <style>
+    .dashboard-container { display: flex; min-height: 100vh; background: #F9FBF4; }
+    .sidebar { width: 240px; background: #fff; box-shadow: 2px 0 12px rgba(44,62,80,0.04); display: flex; flex-direction: column; align-items: stretch; padding: 0; }
+    .sidebar-header { display: flex; align-items: center; gap: 12px; padding: 32px 24px 24px 24px; }
+    .sidebar-logo { width: 38px; height: 38px; border-radius: 12px; background: linear-gradient(135deg, #00BFFF 60%, #1DE9B6 100%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #fff; font-weight: 700; }
+    .sidebar-title { font-size: 1.35rem; font-weight: 700; color: #00BFFF; font-family: 'Montserrat',sans-serif; }
+    .sidebar-menu { display: flex; flex-direction: column; gap: 4px; margin-top: 0; }
+    .sidebar-link { display: flex; align-items: center; gap: 12px; padding: 12px 28px; font-size: 1.08rem; color: #2C3E50; text-decoration: none; border-radius: 8px 0 0 8px; font-weight: 500; transition: background 0.15s, color 0.15s; }
+    .sidebar-link.active { background: #E6F7FF; color: #00BFFF; font-weight: 700; }
+    .sidebar-link .icon { font-size: 1.2rem; }
+    .sidebar-link:hover:not(.active) { background: #F2FAFF; color: #00BFFF; }
+    .sidebar-spacer { flex: 1; }
+    .sidebar-logout { margin: 24px 0 24px 0; text-align: center; }
+    .logout-btn { background: #fff; color: #00BFFF; border: 1.5px solid #00BFFF; border-radius: 8px; padding: 8px 24px; font-weight: 600; cursor: pointer; transition: background 0.15s, color 0.15s; }
+    .logout-btn:hover { background: #00BFFF; color: #fff; }
+    @media (max-width: 1100px) {
+      .sidebar { width: 100px; }
+      .sidebar-title { display: none; }
+      .sidebar-link { padding: 12px 10px; font-size: 0.98rem; }
+    }
+    @media (max-width: 700px) {
+      .dashboard-container { flex-direction: column; }
+      .sidebar { width: 100%; flex-direction: row; height: 60px; box-shadow: 0 2px 12px rgba(44,62,80,0.07); }
+      .sidebar-header, .sidebar-spacer, .sidebar-logout { display: none; }
+      .sidebar-menu { flex-direction: row; gap: 0; margin: 0; width: 100%; justify-content: space-around; }
+      .sidebar-link { border-radius: 0; padding: 10px 0; justify-content: center; width: 100%; }
+    }
+    .expense-main { flex: 1; padding: 36px 36px 24px 36px; }
+    .expense-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
+    .expense-header-left { }
+    .expense-header-title { font-size: 1.6rem; font-weight: 700; color: #2C3E50; margin-bottom: 4px; }
+    .expense-header-sub { color: #7B8A97; font-size: 1.08rem; }
+    .expense-header-right { display: flex; align-items: center; gap: 24px; }
+    .expense-balance { color: #00BFFF; font-size: 1.25rem; font-weight: 700; margin-left: 12px; }
+    
+    /* Unified Top Bar Layout */
+    .top-bar { display: flex; align-items: center; justify-content: flex-end; gap: 1rem; margin-right: 2rem; margin-top: 1rem; }
+    .add-btn { background: #00BFFF; color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 1.08rem; padding: 10px 28px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,191,255,0.08); transition: background 0.18s; }
+    .add-btn:hover { background: #1DE9B6; color: #2C3E50; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #0056A8; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: background 0.2s, transform 0.2s; }
+    .user-avatar:hover { background: #004080; transform: scale(1.05); }
+    
+    /* User Profile Dropdown */
+    .user-profile-dropdown { position: relative; }
+    .dropdown-menu { position: absolute; top: 100%; right: 0; margin-top: 8px; background: #fff; border-radius: 12px; box-shadow: 0 8px 32px rgba(44,62,80,0.12); min-width: 280px; z-index: 1000; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; border: 1px solid #F0F0F0; }
+    .dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
+    .dropdown-header { padding: 20px; display: flex; align-items: center; gap: 12px; }
+    .dropdown-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #00BFFF 60%, #1DE9B6 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; }
+    .dropdown-user-info { flex: 1; }
+    .dropdown-name { font-size: 1.1rem; font-weight: 700; color: #2C3E50; margin-bottom: 4px; }
+    .dropdown-email { font-size: 0.95rem; color: #7B8A97; }
+    .dropdown-divider { height: 1px; background: #F0F0F0; margin: 0; }
+    .dropdown-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: #2C3E50; text-decoration: none; font-size: 1rem; font-weight: 500; transition: background 0.2s; border: none; background: none; width: 100%; text-align: left; cursor: pointer; }
+    .dropdown-item:hover { background: #F8F9FA; color: #00BFFF; }
+    .dropdown-item.logout-item:hover { background: #FFF5F5; color: #FF5A5A; }
+    .dropdown-icon { font-size: 1.1rem; }
+    .expense-sections { display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; }
+    .add-expense-card, .recent-expenses-card { background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(44,62,80,0.07); padding: 28px 24px 24px 24px; flex: 1; min-width: 320px; display: flex; flex-direction: column; }
+    .add-expense-card { max-width: 420px; }
+    .recent-expenses-card { min-width: 320px; }
+    .add-expense-title, .recent-expenses-title { font-size: 1.15rem; font-weight: 700; color: #2C3E50; margin-bottom: 8px; }
+    .add-expense-form { display: flex; flex-direction: column; gap: 16px; }
+    .add-expense-form input, .add-expense-form select, .add-expense-form textarea { font-size: 1rem; padding: 10px 14px; border-radius: 8px; border: 1.5px solid #E0E0E0; outline: none; font-family: inherit; background: #F9FBF4; color: #2C3E50; resize: none; }
+    .add-expense-form input:focus, .add-expense-form select:focus, .add-expense-form textarea:focus { border-color: #00BFFF; background: #fff; }
+    .add-expense-btn { background: linear-gradient(90deg, #00BFFF 40%, #1DE9B6 100%); color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 1.08rem; padding: 12px 0; cursor: pointer; margin-top: 8px; transition: background 0.18s; }
+    .add-expense-btn:hover { background: linear-gradient(90deg, #1DE9B6 40%, #00BFFF 100%); }
+    .recent-expenses-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .recent-expense-item { display: flex; align-items: center; justify-content: space-between; background: #F9FBF4; border-radius: 8px; padding: 12px 16px; font-size: 1rem; }
+    .recent-expense-info { display: flex; flex-direction: column; }
+    .recent-expense-title { font-weight: 600; color: #2C3E50; }
+    .recent-expense-meta { font-size: 0.98rem; color: #7B8A97; display: flex; gap: 12px; }
+    .recent-expense-amount { font-weight: 700; color: #00BFFF; font-size: 1.08rem; }
+    .recent-expense-delete { color: #FF5A5A; font-size: 0.98rem; font-weight: 600; cursor: pointer; margin-left: 18px; }
+    .recent-expense-delete:hover { text-decoration: underline; }
+    .category-breakdown-section { background: linear-gradient(120deg, #E6F7FF 60%, #F9FBF4 100%); border-radius: 18px; box-shadow: 0 2px 12px rgba(44,62,80,0.04); padding: 28px 24px 24px 24px; }
+    .category-breakdown-title { font-size: 1.15rem; font-weight: 700; color: #2C3E50; margin-bottom: 18px; }
+    .category-breakdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .category-card { background: #fff; border-radius: 14px; box-shadow: 0 1px 6px rgba(44,62,80,0.06); padding: 18px 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
+    .category-icon { font-size: 1.3rem; margin-bottom: 2px; }
+    .category-name { font-size: 1.02rem; font-weight: 600; color: #2C3E50; }
+    .category-amount { font-size: 1.08rem; font-weight: 700; color: #00BFFF; }
+    .category-percent { font-size: 0.98rem; color: #7B8A97; }
+    @media (max-width: 1100px) {
+      .expense-sections { flex-direction: column; gap: 18px; }
+      .category-breakdown-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 700px) {
+      .expense-main { padding: 12px 2vw; }
+      .category-breakdown-grid { grid-template-columns: 1fr; }
+      .dropdown-menu { min-width: 260px; right: -10px; }
+      .expense-header-right { gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">P</div>
+        <div class="sidebar-title">Pockit</div>
+      </div>
+      <hr style="border:none;border-top:1.5px solid #F0F0F0;margin:0 18px 0 18px;">
+      <div style="font-size:0.98rem;color:#7B8A97;font-weight:600;padding:18px 0 6px 28px;letter-spacing:0.5px;">Menu</div>
+      <nav class="sidebar-menu">
+        <a href="dashboard.html" class="sidebar-link"><span class="icon">🏠</span>Dashboard</a>
+        <a href="expense.html" class="sidebar-link active"><span class="icon">💸</span>Expenses</a>
+        <a href="emi.html" class="sidebar-link"><span class="icon">📅</span>EMI Manager</a>
+        <a href="debt.html" class="sidebar-link"><span class="icon">📊</span>Debt Tracker</a>
+        <a href="savings.html" class="sidebar-link"><span class="icon">🎯</span>Savings Goals</a>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-logout">
+        <button class="logout-btn" onclick="handleLogout()">Logout</button>
+      </div>
+    </aside>
+    <!-- Main Section -->
+    <main class="expense-main">
+      <!-- Header -->
+      <div class="expense-header">
+        <div class="expense-header-left">
+          <div class="expense-header-title">Expense Tracker</div>
+          <div class="expense-header-sub">Track and categorize your daily expenses</div>
+        </div>
+        <div class="expense-header-right">
+          
+          <div class="expense-balance">₹1,390</div>
+          <div class="top-bar">
+            
+            <div class="user-profile-dropdown">
+              <div class="user-avatar" id="userAvatar" onclick="toggleDropdown()">JD</div>
+              <div class="dropdown-menu" id="dropdownMenu">
+                <div class="dropdown-header">
+                  <div class="dropdown-avatar" id="dropdownAvatar">JD</div>
+                  <div class="dropdown-user-info">
+                    <div class="dropdown-name" id="dropdownName">John Doe</div>
+                    <div class="dropdown-email" id="dropdownEmail">john@example.com</div>
+                  </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                <a href="profile.html" class="dropdown-item">
+                  <span class="dropdown-icon">👤</span>
+                  View Profile
+                </a>
+                <a href="settings.html" class="dropdown-item">
+                  <span class="dropdown-icon">⚙️</span>
+                  Settings
+                </a>
+                <div class="dropdown-divider"></div>
+                <button class="dropdown-item logout-item" onclick="handleLogout()">
+                  <span class="dropdown-icon">🚪</span>
+                  Log out
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Add & Recent Expenses -->
+      <div class="expense-sections">
+        <div class="add-expense-card">
+          
+          <form class="add-expense-form" id="addExpenseForm" autocomplete="off">
+            <input type="number" step="0.01" placeholder="₹ 0.00" id="expenseAmount" />
+            <select id="expenseCategory">
+              <option value="">Select category</option>
+              <option>Food & Dining</option>
+              <option>Transportation</option>
+              <option>Rent & Utilities</option>
+              <option>Entertainment</option>
+              <option>Healthcare</option>
+              <option>Shopping</option>
+              <option>Others</option>
+            </select>
+            <textarea rows="2" placeholder="What did you spend on?" id="expenseNote"></textarea>
+            <button type="submit" class="add-expense-btn">Add Expense</button>
+          </form>
+        </div>
+        <div class="recent-expenses-card">
+          <div class="recent-expenses-title">Recent Expenses</div>
+          <ul class="recent-expenses-list" id="recentExpensesList">
+            <!-- Recent expenses will be rendered here by JS -->
+          </ul>
+        </div>
+      </div>
+      <!-- Category Breakdown -->
+      <div class="category-breakdown-section">
+        <div class="category-breakdown-title">Category Breakdown</div>
+        <div class="category-breakdown-grid" id="categoryBreakdownGrid">
+          <!-- Category cards will be rendered here by JS -->
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="js/main.js"></script>
+  <script>
+    // Dropdown functionality
+    function toggleDropdown() {
+      const dropdown = document.getElementById('dropdownMenu');
+      dropdown.classList.toggle('show');
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+      const dropdown = document.getElementById('dropdownMenu');
+      const avatar = document.getElementById('userAvatar');
+      
+      if (!dropdown.contains(event.target) && !avatar.contains(event.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+
+    // Close dropdown on escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        const dropdown = document.getElementById('dropdownMenu');
+        dropdown.classList.remove('show');
+      }
+    });
+
+    // Authentication check - redirect to login if not authenticated
+    window.addEventListener('DOMContentLoaded', async function() {
+      const storedUser = localStorage.getItem('user');
+      if (!storedUser || storedUser === 'null' || storedUser === 'undefined') {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      try {
+        let userData;
+        try {
+          // First try to get user from localStorage
+          userData = JSON.parse(storedUser);
+          
+          // Optionally try to fetch fresh data from server (but don't fail if it doesn't work)
+          try {
+            const res = await fetch('/api/current-user');
+            if (res.ok) {
+              const serverUser = await res.json();
+              // Update localStorage with fresh data
+              localStorage.setItem('user', JSON.stringify(serverUser));
+              userData = serverUser;
+            }
+          } catch (serverError) {
+            // If server request fails, continue with localStorage data
+            console.log('Using cached user data');
+          }
+        } catch (parseError) {
+          console.error('Failed to parse stored user data:', parseError);
+          localStorage.removeItem('user');
+          window.location.href = 'login.html';
+          return;
+        }
+
+        // Generate initials
+        const initials = userData.name.split(' ').map(n => n[0]).join('');
+        
+        // Update avatars and user info
+        document.getElementById('userAvatar').textContent = initials;
+        document.getElementById('dropdownAvatar').textContent = initials;
+        document.getElementById('dropdownName').textContent = userData.name;
+        document.getElementById('dropdownEmail').textContent = userData.email;
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+      }
+    });
+
+    // Logout function
+    async function handleLogout() {
+      try {
+        const response = await fetch('/api/logout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        localStorage.removeItem('user');
+        window.location.href = 'login.html?logout=true';
+      } catch (error) {
+        console.error('Logout error:', error);
+        localStorage.removeItem('user');
+        window.location.href = 'login.html?logout=true';
+      }
+    }
+
+    // Update logout button to use the logout function
+    document.addEventListener('DOMContentLoaded', function() {
+      const logoutBtn = document.querySelector('.logout-btn');
+      if (logoutBtn) {
+        logoutBtn.onclick = handleLogout;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pockit – Smart Financial Assistant</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@700&display=swap" rel="stylesheet"/>
+  <script src="js/theme.js"></script>
+  <style>
+    body.dark-mode {
+      background: #181A20;
+      color: #F3F3F3;
+    }
+    body.dark-mode .pockit-nav {
+      background: #23252B;
+      color: #F3F3F3;
+    }
+    body.dark-mode .pockit-btn {
+      background: #23252B;
+      color: #F3F3F3;
+      border: 1px solid #444;
+    }
+    body.dark-mode .pockit-feature-card {
+      background: #23252B;
+      color: #F3F3F3;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    }
+    body.dark-mode .pockit-cta-inner {
+      background: #23252B;
+      color: #F3F3F3;
+    }
+    
+    /* Header Buttons - Top Right Corner */
+    .header-buttons {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 1rem;
+      z-index: 1000;
+    }
+    
+    .header-btn {
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 10px 24px;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0,191,255,0.08);
+    }
+    
+    .header-btn.login {
+      background: #fff;
+      color: #2C3E50;
+      border: 1.5px solid #E0E0E0;
+    }
+    
+    .header-btn.login:hover {
+      background: #F9FBF4;
+      color: #00BFFF;
+      border: 1.5px solid #00BFFF;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,191,255,0.15);
+    }
+    
+    .header-btn.register {
+      background: #00BFFF;
+      color: #fff;
+      border: none;
+      box-shadow: 0 4px 16px rgba(0,191,255,0.12);
+    }
+    
+    .header-btn.register:hover {
+      background: #1DE9B6;
+      color: #2C3E50;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(29,233,182,0.25);
+    }
+    
+    /* Dark mode styles for header buttons */
+    body.dark-mode .header-btn.login {
+      background: #23252B;
+      color: #F3F3F3;
+      border: 1px solid #444;
+    }
+    
+    body.dark-mode .header-btn.login:hover {
+      background: #2d2d2d;
+      color: #00BFFF;
+      border: 1px solid #00BFFF;
+    }
+    
+    body.dark-mode .header-btn.register {
+      background: #00BFFF;
+      color: #fff;
+    }
+    
+    body.dark-mode .header-btn.register:hover {
+      background: #1DE9B6;
+      color: #2C3E50;
+    }
+    
+    /* Responsive styles */
+    @media (max-width: 700px) {
+      .header-buttons {
+        top: 15px;
+        right: 15px;
+        gap: 0.5rem;
+      }
+      
+      .header-btn {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+      }
+    }
+    
+    @media (max-width: 500px) {
+      .header-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .header-btn {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body class="light-mode">
+  <!-- Header Buttons - Top Right Corner -->
+  <div class="header-buttons">
+    <a href="/login.html" class="header-btn login">Login</a>
+    <a href="/register.html" class="header-btn register">Register</a>
+  </div>
+
+  <nav class="pockit-nav">
+    <div class="pockit-nav-left">
+      <img src="images/im1.png" alt="Pockit Logo" class="pockit-logo"/>
+      <span class="pockit-brand">Pockit</span>
+    </div>
+    <div class="pockit-nav-right">
+      <!-- Buttons moved to top right corner -->
+    </div>
+  </nav>
+
+  <main>
+    <section class="pockit-hero">
+      <div class="pockit-hero-left">
+        <h1 class="pockit-hero-title">Master Your <span class="pockit-highlight">Finances</span> with Pockit</h1>
+        <p class="pockit-hero-desc">
+          Track expenses, manage EMIs, monitor debts, and achieve your savings goals with powerful analytics and smart insights. Your personal finance companion.
+        </p>
+        <div class="pockit-hero-actions">
+          <a href="/register.html" class="pockit-btn hero-primary">Start Tracking Now</a>
+          <a href="/login.html" class="pockit-btn hero-secondary">Sign In</a>
+        </div>
+      </div>
+      <div class="pockit-hero-right">
+        <img src="images/im2.png" alt="Finance App" class="pockit-hero-img"/>
+      </div>
+    </section>
+
+    <section class="pockit-features">
+      <h2 class="pockit-features-title">Everything You Need to Manage Your Money</h2>
+      <p class="pockit-features-desc">Powerful features designed to make financial management simple and effective</p>
+      <div class="pockit-features-grid">
+        <div class="pockit-feature-card">
+          <img src="https://img.icons8.com/color/48/000000/combo-chart--v2.png" alt="Smart Analytics" class="pockit-feature-icon"/>
+          <h3>Smart Analytics</h3>
+          <p>Interactive charts and insights to track your spending patterns</p>
+        </div>
+        <div class="pockit-feature-card">
+          <img src="https://img.icons8.com/color/48/000000/money-bag.png" alt="Expense Tracking" class="pockit-feature-icon"/>
+          <h3>Expense Tracking</h3>
+          <p>Categorize and monitor all your expenses in real-time</p>
+        </div>
+        <div class="pockit-feature-card">
+          <img src="https://img.icons8.com/color/48/000000/bank.png" alt="EMI Management" class="pockit-feature-icon"/>
+          <h3>EMI Management</h3>
+          <p>Never miss an EMI payment with smart reminders</p>
+        </div>
+        <div class="pockit-feature-card">
+          <img src="https://img.icons8.com/color/48/000000/goal.png" alt="Savings Goals" class="pockit-feature-icon"/>
+          <h3>Savings Goals</h3>
+          <p>Set and achieve your financial goals with personalized tips</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="pockit-cta">
+      <div class="pockit-cta-inner">
+        <h2 class="pockit-cta-title">Ready to Take Control?</h2>
+        <p class="pockit-cta-desc">Join thousands of users who have transformed their financial habits with Pockit. Start your journey to financial freedom today.</p>
+        <a href="/register.html" class="pockit-btn cta-btn">Get Started</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/main.js"></script>
+
+</body>
+</html>

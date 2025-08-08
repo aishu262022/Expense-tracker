@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pockit – Profile</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Inter:wght@400;600&family=Montserrat:wght@700&display=swap" rel="stylesheet"/>
+  <script src="js/theme.js"></script>
+  <style>
+    /* CSS Variables for Theme Management */
+    :root {
+      /* Light Mode Colors */
+      --bg-primary: #F9FBF4;
+      --bg-secondary: #fff;
+      --bg-card: #fff;
+      --text-primary: #2C3E50;
+      --text-secondary: #7B8A97;
+      --border-color: #F0F0F0;
+      --input-bg: #fff;
+      --input-border: #E0E0E0;
+      --input-focus: #00BFFF;
+      --shadow: rgba(44,62,80,0.07);
+      --shadow-dark: rgba(44,62,80,0.12);
+      --sidebar-bg: #fff;
+      --dropdown-bg: #fff;
+      --dropdown-border: #F0F0F0;
+      --hover-bg: #F2FAFF;
+      --active-bg: #E6F7FF;
+      --avatar-bg: #E6F7FF;
+      --avatar-color: #00BFFF;
+    }
+
+    /* Dark Mode Colors */
+    body.dark-mode {
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2d2d2d;
+      --bg-card: #2d2d2d;
+      --text-primary: #ffffff;
+      --text-secondary: #b0b0b0;
+      --border-color: #555;
+      --input-bg: #3a3a3a;
+      --input-border: #555;
+      --input-focus: #00BFFF;
+      --shadow: rgba(0,0,0,0.3);
+      --shadow-dark: rgba(0,0,0,0.5);
+      --sidebar-bg: #2d2d2d;
+      --dropdown-bg: #2d2d2d;
+      --dropdown-border: #555;
+      --hover-bg: #3a3a3a;
+      --active-bg: linear-gradient(90deg, #00BFFF 60%, #1DE9B6 100%);
+      --avatar-bg: #3a3a3a;
+      --avatar-color: #00BFFF;
+    }
+
+    /* Additional Dark Mode Overrides */
+    body.dark-mode hr {
+      border-color: var(--border-color);
+    }
+    
+    body.dark-mode .sidebar-link {
+      color: var(--text-primary);
+    }
+    
+    body.dark-mode .sidebar-link:hover:not(.active) {
+      background: var(--hover-bg);
+      color: #00BFFF;
+    }
+    
+    body.dark-mode .sidebar-link.active {
+      background: var(--active-bg);
+      color: #fff;
+    }
+    
+    body.dark-mode .logout-btn {
+      background: var(--bg-secondary);
+      color: #00BFFF;
+      border-color: #00BFFF;
+    }
+    
+    body.dark-mode .logout-btn:hover {
+      background: #00BFFF;
+      color: #fff;
+    }
+
+    /* Profile-specific styles with CSS Variables */
+    .profile-container { 
+      display: flex; 
+      min-height: 100vh; 
+      background: var(--bg-primary);
+      transition: background-color 0.3s ease;
+    }
+    
+    .sidebar { 
+      width: 240px; 
+      background: var(--sidebar-bg); 
+      box-shadow: 2px 0 12px var(--shadow); 
+      display: flex; 
+      flex-direction: column; 
+      align-items: stretch; 
+      padding: 0;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .sidebar-header { 
+      display: flex; 
+      align-items: center; 
+      gap: 12px; 
+      padding: 32px 24px 24px 24px; 
+    }
+    
+    .sidebar-logo { 
+      width: 38px; 
+      height: 38px; 
+      border-radius: 12px; 
+      background: linear-gradient(135deg, #00BFFF 60%, #1DE9B6 100%); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-size: 1.5rem; 
+      color: #fff; 
+      font-weight: 700; 
+    }
+    
+    .sidebar-title { 
+      font-size: 1.35rem; 
+      font-weight: 700; 
+      color: #00BFFF; 
+      font-family: 'Montserrat',sans-serif; 
+    }
+    
+    .sidebar-menu { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 4px; 
+      margin-top: 32px; 
+    }
+    
+    .sidebar-link { 
+      display: flex; 
+      align-items: center; 
+      gap: 12px; 
+      padding: 12px 28px; 
+      font-size: 1.08rem; 
+      color: var(--text-primary); 
+      text-decoration: none; 
+      border-radius: 8px 0 0 8px; 
+      font-weight: 500; 
+      transition: background 0.15s, color 0.15s; 
+    }
+    
+    .sidebar-link.active { 
+      background: var(--active-bg); 
+      color: #00BFFF; 
+      font-weight: 700; 
+    }
+    
+    .sidebar-link .icon { 
+      font-size: 1.2rem; 
+    }
+    
+    .sidebar-link:hover:not(.active) { 
+      background: var(--hover-bg); 
+      color: #00BFFF; 
+    }
+    
+    .sidebar-spacer { 
+      flex: 1; 
+    }
+    
+    .sidebar-logout { 
+      margin: 24px 0 24px 0; 
+      text-align: center; 
+    }
+    
+    .logout-btn { 
+      background: var(--bg-secondary); 
+      color: #00BFFF; 
+      border: 1.5px solid #00BFFF; 
+      border-radius: 8px; 
+      padding: 8px 24px; 
+      font-weight: 600; 
+      cursor: pointer; 
+      transition: background 0.15s, color 0.15s; 
+    }
+    
+    .logout-btn:hover { 
+      background: #00BFFF; 
+      color: #fff; 
+    }
+    
+    /* Main content */
+    .main-content { 
+      flex: 1; 
+      padding: 36px 36px 24px 36px; 
+      background: var(--bg-primary);
+      transition: background-color 0.3s ease;
+    }
+    
+    .profile-header { 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      margin-bottom: 32px; 
+    }
+    
+    .profile-title { 
+      font-size: 2rem; 
+      font-weight: 700; 
+      color: var(--text-primary); 
+      margin: 0;
+      transition: color 0.3s ease;
+    }
+    
+    .back-btn { 
+      background: var(--bg-secondary); 
+      color: #00BFFF; 
+      border: 1.5px solid #00BFFF; 
+      border-radius: 8px; 
+      padding: 10px 20px; 
+      font-weight: 600; 
+      cursor: pointer; 
+      transition: background 0.15s, color 0.15s; 
+      text-decoration: none; 
+      display: inline-flex; 
+      align-items: center; 
+      gap: 8px; 
+    }
+    
+    .back-btn:hover { 
+      background: #00BFFF; 
+      color: #fff; 
+    }
+    
+    /* Profile card */
+    .profile-card { 
+      background: var(--bg-card); 
+      border-radius: 16px; 
+      box-shadow: 0 2px 12px var(--shadow); 
+      padding: 32px; 
+      max-width: 600px;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .profile-avatar-section { 
+      display: flex; 
+      align-items: center; 
+      gap: 24px; 
+      margin-bottom: 32px; 
+      padding-bottom: 24px; 
+      border-bottom: 1px solid var(--border-color);
+      transition: border-color 0.3s ease;
+    }
+    
+    .profile-avatar { 
+      width: 80px; 
+      height: 80px; 
+      border-radius: 50%; 
+      background: linear-gradient(135deg, #00BFFF 60%, #1DE9B6 100%); 
+      color: #fff; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-weight: 700; 
+      font-size: 2rem; 
+    }
+    
+    .profile-info { 
+      flex: 1; 
+    }
+    
+    .profile-name { 
+      font-size: 1.5rem; 
+      font-weight: 700; 
+      color: var(--text-primary); 
+      margin: 0 0 8px 0;
+      transition: color 0.3s ease;
+    }
+    
+    .profile-email { 
+      font-size: 1.1rem; 
+      color: var(--text-secondary); 
+      margin: 0;
+      transition: color 0.3s ease;
+    }
+    
+    /* Form styles */
+    .profile-form { 
+      display: grid; 
+      gap: 24px; 
+    }
+    
+    .form-group { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 8px; 
+    }
+    
+    .form-label { 
+      font-size: 1rem; 
+      font-weight: 600; 
+      color: var(--text-primary);
+      transition: color 0.3s ease;
+    }
+    
+    .form-input { 
+      padding: 12px 16px; 
+      border: 1.5px solid var(--input-border); 
+      border-radius: 8px; 
+      font-size: 1rem; 
+      color: var(--text-primary); 
+      background: var(--input-bg); 
+      transition: border-color 0.2s, background-color 0.3s ease, color 0.3s ease; 
+    }
+    
+    .form-input:focus { 
+      outline: none; 
+      border-color: var(--input-focus); 
+      background: var(--input-bg);
+    }
+    
+    .form-input:disabled { 
+      background: var(--hover-bg); 
+      color: var(--text-secondary); 
+      cursor: not-allowed; 
+    }
+    
+    .form-row { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 16px; 
+    }
+    
+    /* Buttons */
+    .profile-actions { 
+      display: flex; 
+      gap: 16px; 
+      margin-top: 32px; 
+      padding-top: 24px; 
+      border-top: 1px solid var(--border-color);
+      transition: border-color 0.3s ease;
+    }
+    
+    .btn { 
+      padding: 12px 24px; 
+      border-radius: 8px; 
+      font-weight: 600; 
+      cursor: pointer; 
+      transition: all 0.2s; 
+      border: none; 
+      font-size: 1rem; 
+    }
+    
+    .btn-primary { 
+      background: #00BFFF; 
+      color: #fff; 
+    }
+    
+    .btn-primary:hover { 
+      background: #1DE9B6; 
+    }
+    
+    .btn-secondary { 
+      background: var(--bg-secondary); 
+      color: #00BFFF; 
+      border: 1.5px solid #00BFFF;
+      transition: background-color 0.3s ease;
+    }
+    
+    .btn-secondary:hover { 
+      background: var(--hover-bg); 
+    }
+    
+    .btn-danger { 
+      background: #FF5A5A; 
+      color: #fff; 
+    }
+    
+    .btn-danger:hover { 
+      background: #FF4444; 
+    }
+    
+    /* User Profile Dropdown */
+    .user-profile-dropdown { 
+      position: relative; 
+    }
+    
+    .dropdown-menu { 
+      position: absolute; 
+      top: 100%; 
+      right: 0; 
+      margin-top: 8px; 
+      background: var(--dropdown-bg); 
+      border-radius: 12px; 
+      box-shadow: 0 8px 32px var(--shadow-dark); 
+      min-width: 280px; 
+      z-index: 1000; 
+      opacity: 0; 
+      visibility: hidden; 
+      transform: translateY(-10px); 
+      transition: all 0.3s ease; 
+      border: 1px solid var(--dropdown-border);
+    }
+    
+    .dropdown-menu.show { 
+      opacity: 1; 
+      visibility: visible; 
+      transform: translateY(0); 
+    }
+    
+    .dropdown-header { 
+      padding: 20px; 
+      display: flex; 
+      align-items: center; 
+      gap: 12px; 
+    }
+    
+    .dropdown-avatar { 
+      width: 48px; 
+      height: 48px; 
+      border-radius: 50%; 
+      background: linear-gradient(135deg, #00BFFF 60%, #1DE9B6 100%); 
+      color: #fff; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-weight: 700; 
+      font-size: 1.2rem; 
+    }
+    
+    .dropdown-user-info { 
+      flex: 1; 
+    }
+    
+    .dropdown-name { 
+      font-size: 1.1rem; 
+      font-weight: 700; 
+      color: var(--text-primary); 
+      margin-bottom: 4px;
+      transition: color 0.3s ease;
+    }
+    
+    .dropdown-email { 
+      font-size: 0.95rem; 
+      color: var(--text-secondary);
+      transition: color 0.3s ease;
+    }
+    
+    .dropdown-divider { 
+      height: 1px; 
+      background: var(--border-color); 
+      margin: 0;
+      transition: background-color 0.3s ease;
+    }
+    
+    .dropdown-item { 
+      display: flex; 
+      align-items: center; 
+      gap: 12px; 
+      padding: 12px 20px; 
+      color: var(--text-primary); 
+      text-decoration: none; 
+      font-size: 1rem; 
+      font-weight: 500; 
+      transition: background 0.2s, color 0.3s ease; 
+      border: none; 
+      background: none; 
+      width: 100%; 
+      text-align: left; 
+      cursor: pointer; 
+    }
+    
+    .dropdown-item:hover { 
+      background: var(--hover-bg); 
+      color: #00BFFF; 
+    }
+    
+    .dropdown-item.logout-item:hover { 
+      background: #FFF5F5; 
+      color: #FF5A5A; 
+    }
+    
+    body.dark-mode .dropdown-item.logout-item:hover {
+      background: #3a1a1a;
+      color: #FF5A5A;
+    }
+    
+    .dropdown-icon { 
+      font-size: 1.1rem; 
+    }
+    
+    .user-avatar { 
+      width: 40px; 
+      height: 40px; 
+      border-radius: 50%; 
+      background: var(--avatar-bg); 
+      color: var(--avatar-color); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-weight: 700; 
+      font-size: 1.1rem; 
+      margin-left: 8px; 
+      cursor: pointer; 
+      transition: background 0.2s, transform 0.2s, background-color 0.3s ease, color 0.3s ease; 
+    }
+    
+    .user-avatar:hover { 
+      background: var(--hover-bg); 
+      transform: scale(1.05); 
+    }
+    
+    /* Theme Toggle Button */
+    .theme-toggle-btn {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1.5px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 40px;
+      height: 40px;
+    }
+    
+    .theme-toggle-btn:hover {
+      background: var(--hover-bg);
+      border-color: var(--input-focus);
+      transform: scale(1.05);
+    }
+    
+    body.dark-mode .theme-toggle-btn {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border-color: var(--border-color);
+    }
+    
+    body.dark-mode .theme-toggle-btn:hover {
+      background: var(--hover-bg);
+      border-color: var(--input-focus);
+    }
+    
+    /* Profile Header Right Layout */
+    .profile-header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .sidebar { width: 100px; }
+      .sidebar-title { display: none; }
+      .sidebar-link { padding: 12px 10px; font-size: 0.98rem; }
+      .main-content { padding: 24px 8px; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 700px) {
+      .profile-container { flex-direction: column; }
+      .sidebar { width: 100%; flex-direction: row; height: 60px; box-shadow: 0 2px 12px var(--shadow); }
+      .sidebar-header, .sidebar-spacer, .sidebar-logout { display: none; }
+      .sidebar-menu { flex-direction: row; gap: 0; margin: 0; width: 100%; justify-content: space-around; }
+      .sidebar-link { border-radius: 0; padding: 10px 0; justify-content: center; width: 100%; }
+      .main-content { padding: 12px 2vw; }
+      .profile-card { padding: 24px; }
+      .profile-avatar-section { flex-direction: column; text-align: center; }
+      .profile-actions { flex-direction: column; }
+      .dropdown-menu { min-width: 260px; right: -10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">P</div>
+        <div class="sidebar-title">Pockit</div>
+      </div>
+      <hr style="border:none;border-top:1.5px solid #F0F0F0;margin:0 18px 0 18px;">
+      <div style="font-size:0.98rem;color:#7B8A97;font-weight:600;padding:18px 0 6px 28px;letter-spacing:0.5px;">Menu</div>
+      <nav class="sidebar-menu">
+        <a href="dashboard.html" class="sidebar-link"><span class="icon">🏠</span>Dashboard</a>
+        <a href="expense.html" class="sidebar-link"><span class="icon">💸</span>Expenses</a>
+        <a href="emi.html" class="sidebar-link"><span class="icon">📅</span>EMI Manager</a>
+        <a href="debt.html" class="sidebar-link"><span class="icon">📊</span>Debt Tracker</a>
+        <a href="savings.html" class="sidebar-link"><span class="icon">🎯</span>Savings Goals</a>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-logout">
+        <button class="logout-btn" onclick="handleLogout()">Logout</button>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <div class="profile-header">
+        <h1 class="profile-title">Profile</h1>
+        <div class="profile-header-right">
+          <button id="themeToggle" class="theme-toggle-btn" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+            🌙
+          </button>
+          <div class="user-profile-dropdown">
+            <div class="user-avatar" id="userAvatar" onclick="toggleDropdown()">JD</div>
+            <div class="dropdown-menu" id="dropdownMenu">
+              <div class="dropdown-header">
+                <div class="dropdown-avatar" id="dropdownAvatar">JD</div>
+                <div class="dropdown-user-info">
+                  <div class="dropdown-name" id="dropdownName">John Doe</div>
+                  <div class="dropdown-email" id="dropdownEmail">john@example.com</div>
+                </div>
+              </div>
+              <div class="dropdown-divider"></div>
+              <a href="profile.html" class="dropdown-item">
+                <span class="dropdown-icon">👤</span>
+                View Profile
+              </a>
+              <a href="settings.html" class="dropdown-item">
+                <span class="dropdown-icon">⚙️</span>
+                Settings
+              </a>
+              <div class="dropdown-divider"></div>
+              <button class="dropdown-item logout-item" onclick="handleLogout()">
+                <span class="dropdown-icon">🚪</span>
+                Log out
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Profile Card -->
+      <div class="profile-card">
+        <div class="profile-avatar-section">
+          <div class="profile-avatar" id="profileAvatar">JD</div>
+          <div class="profile-info">
+            <h2 class="profile-name" id="profileName">John Doe</h2>
+            <p class="profile-email" id="profileEmail">john@example.com</p>
+          </div>
+        </div>
+        
+        <form class="profile-form" id="profileForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="name">Full Name</label>
+              <input type="text" id="name" name="name" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="email">Email</label>
+              <input type="email" id="email" name="email" class="form-input" required>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="mobile">Mobile Number</label>
+              <input type="tel" id="mobile" name="mobile" class="form-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="occupation">Occupation</label>
+              <input type="text" id="occupation" name="occupation" class="form-input">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="salary">Monthly Salary</label>
+            <input type="number" id="salary" name="salary" class="form-input" min="0">
+          </div>
+          
+          <div class="profile-actions">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="dashboard.html" class="btn btn-secondary">Back to Dashboard</a>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+  
+  <script>
+    // Dropdown functionality
+    function toggleDropdown() {
+      const dropdown = document.getElementById('dropdownMenu');
+      dropdown.classList.toggle('show');
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+      const dropdown = document.getElementById('dropdownMenu');
+      const avatar = document.getElementById('userAvatar');
+      
+      if (!dropdown.contains(event.target) && !avatar.contains(event.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+
+    // Close dropdown on escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        const dropdown = document.getElementById('dropdownMenu');
+        dropdown.classList.remove('show');
+      }
+    });
+
+    // Logout function
+    async function handleLogout() {
+      try {
+        const response = await fetch('/api/logout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include'
+        });
+        localStorage.removeItem('user');
+        window.location.href = 'login.html?logout=true';
+      } catch (error) {
+        console.error('Logout error:', error);
+        localStorage.removeItem('user');
+        window.location.href = 'login.html?logout=true';
+      }
+    }
+
+    // Load user data and populate form
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (!storedUser) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        let user;
+        try {
+          // First try to get user from localStorage
+          user = JSON.parse(storedUser);
+          
+          // Always validate session with server; redirect if not logged in
+          try {
+            const res = await fetch('/api/current-user', { credentials: 'include' });
+            if (res.ok) {
+              const serverUser = await res.json();
+              // Update localStorage with fresh data
+              localStorage.setItem('user', JSON.stringify(serverUser));
+              user = serverUser;
+            } else {
+              // Not logged in on server – clear cache and redirect
+              localStorage.removeItem('user');
+              window.location.href = 'login.html';
+              return;
+            }
+          } catch (serverError) {
+            // If server request fails, treat as not authenticated
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+            return;
+          }
+        } catch (parseError) {
+          console.error('Failed to parse stored user data:', parseError);
+          localStorage.removeItem('user');
+          window.location.href = 'login.html';
+          return;
+        }
+
+        // Generate initials
+        const initials = user.name.split(' ').map(n => n[0]).join('');
+        
+        // Update avatars and user info
+        document.getElementById('userAvatar').textContent = initials;
+        document.getElementById('dropdownAvatar').textContent = initials;
+        document.getElementById('dropdownName').textContent = user.name;
+        document.getElementById('dropdownEmail').textContent = user.email;
+        document.getElementById('profileAvatar').textContent = initials;
+        document.getElementById('profileName').textContent = user.name;
+        document.getElementById('profileEmail').textContent = user.email;
+
+        // Populate form fields
+        document.getElementById('name').value = user.name || '';
+        document.getElementById('email').value = user.email || '';
+        document.getElementById('mobile').value = user.mobile || '';
+        document.getElementById('occupation').value = user.occupation || '';
+        document.getElementById('salary').value = user.salary || '';
+
+        // Initialize theme and update toggle icon
+        initializeTheme();
+        updateThemeToggleIcon();
+
+      } catch (err) {
+        console.error('Failed to load user data:', err);
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+      }
+    });
+
+    // Theme management functions
+    function initializeTheme() {
+      const theme = localStorage.getItem('theme') || 'light';
+      const isDark = theme === 'dark';
+      applyDarkMode(isDark);
+      updateThemeToggleIcon();
+    }
+
+    function applyDarkMode(isDark) {
+      if (isDark) {
+        document.body.classList.add('dark-mode');
+      } else {
+        document.body.classList.remove('dark-mode');
+      }
+    }
+
+    function toggleDarkMode() {
+      const currentTheme = localStorage.getItem('theme') || 'light';
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      const isDark = newTheme === 'dark';
+      
+      localStorage.setItem('theme', newTheme);
+      applyDarkMode(isDark);
+      updateThemeToggleIcon();
+    }
+
+    function updateThemeToggleIcon() {
+      const toggleBtn = document.getElementById('themeToggle');
+      if (toggleBtn) {
+        const isDark = document.body.classList.contains('dark-mode');
+        toggleBtn.textContent = isDark ? '☀️' : '🌙';
+        toggleBtn.title = isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+      }
+    }
+
+    // Handle form submission
+    document.getElementById('profileForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const userData = {
+        name: formData.get('name'),
+        email: formData.get('email'),
+        mobile: formData.get('mobile'),
+        occupation: formData.get('occupation'),
+        salary: parseFloat(formData.get('salary')) || 0
+      };
+
+      try {
+        const response = await fetch('/api/update-profile', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(userData)
+        });
+
+        if (response.ok) {
+          // Update localStorage
+          const currentUser = JSON.parse(localStorage.getItem('user'));
+          const updatedUser = { ...currentUser, ...userData };
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+          
+          alert('Profile updated successfully!');
+          window.location.reload();
+        } else {
+          const error = await response.json();
+          alert('Failed to update profile: ' + error.message);
+        }
+      } catch (error) {
+        console.error('Update error:', error);
+        alert('Failed to update profile. Please try again.');
+      }
+    });
+  </script>
+</body>
+</html> 

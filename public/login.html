@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pockit – Login</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Inter:wght@400;600&family=Montserrat:wght@700&display=swap" rel="stylesheet"/>
+  <script src="js/theme.js"></script>
+  <style>
+    /* Toast Notification Styles */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      padding: 16px 20px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      z-index: 1000;
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+      max-width: 300px;
+    }
+    .toast.show {
+      transform: translateX(0);
+    }
+    .toast.success {
+      border-left: 4px solid #1DE9B6;
+      color: #2C3E50;
+    }
+    .toast.error {
+      border-left: 4px solid #FF5A5A;
+      color: #2C3E50;
+    }
+    .toast.warning {
+      border-left: 4px solid #FFA726;
+      color: #2C3E50;
+    }
+    
+    /* Password Toggle Button */
+    .password-container {
+      position: relative;
+    }
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      color: #7B8A97;
+      padding: 4px;
+      border-radius: 4px;
+      transition: color 0.2s;
+    }
+    .password-toggle:hover {
+      color: #00BFFF;
+    }
+    
+    /* Loading State */
+    .auth-btn.loading {
+      background: #7B8A97;
+      cursor: not-allowed;
+      position: relative;
+    }
+    .auth-btn.loading::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top: 2px solid #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    
+    /* Form Validation Styles */
+    .auth-input.error {
+      border-color: #FF5A5A;
+      box-shadow: 0 0 0 2px rgba(255,90,90,0.1);
+    }
+    .auth-input.success {
+      border-color: #1DE9B6;
+      box-shadow: 0 0 0 2px rgba(29,233,182,0.1);
+    }
+    .error-message {
+      color: #FF5A5A;
+      font-size: 0.85rem;
+      margin-top: 4px;
+      display: none;
+    }
+    .error-message.show {
+      display: block;
+    }
+  </style>
+</head>
+<body class="auth-bg">
+  <div class="auth-header">
+    <div class="auth-logo">
+      <span class="auth-logo-p">P</span>
+      <span class="auth-logo-text">Pockit</span>
+    </div>
+    <div class="auth-subtitle">Manage your finances with ease</div>
+  </div>
+  <main>
+    <div class="auth-card">
+      <h2 class="auth-title">Get Started</h2>
+      <div class="auth-subtext">Create an account or sign in to continue</div>
+      <div class="auth-tabs">
+        <a href="login.html" class="auth-tab active">Login</a>
+        <a href="register.html" class="auth-tab">Register</a>
+      </div>
+      <form class="auth-form" id="loginForm" autocomplete="off">
+        <label for="email" class="auth-label">Email</label>
+        <input type="email" id="email" name="email" class="auth-input" placeholder="your@email.com" autocomplete="username" required/>
+        <div class="error-message" id="emailError"></div>
+        
+        <label for="password" class="auth-label">Password</label>
+        <div class="password-container">
+          <input type="password" id="password" name="password" class="auth-input" placeholder="Enter your password" autocomplete="current-password" required/>
+          <button type="button" class="password-toggle" id="passwordToggle">👁️</button>
+        </div>
+        <div class="error-message" id="passwordError"></div>
+        
+        <button type="submit" class="auth-btn" id="loginBtn">Sign In</button>
+      </form>
+      
+      <div class="auth-link-section">
+        <span class="auth-link-text">New user? </span>
+        <a href="register.html" class="auth-link">Register here</a>
+      </div>
+      
+      <div style="text-align: center; margin-top: 16px;">
+        <div id="currentUserInfo" style="margin-bottom: 8px; font-size: 0.9rem; color: #7B8A97; display: none;"></div>
+        <button type="button" class="switch-user-btn" id="switchUserBtn" style="background: none; border: none; color: #00BFFF; text-decoration: underline; cursor: pointer; font-size: 0.9rem;">Switch User / Clear Session</button>
+      </div>
+    </div>
+    <div class="auth-footer">
+      <a href="index.html" class="auth-back">&larr; Back to Home</a>
+    </div>
+  </main>
+
+  <script src="js/main.js"></script>
+  <script>
+    // DOM Elements
+    const loginForm = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const loginBtn = document.getElementById('loginBtn');
+    const passwordToggle = document.getElementById('passwordToggle');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const switchUserBtn = document.getElementById('switchUserBtn');
+    const currentUserInfo = document.getElementById('currentUserInfo');
+
+    // Toast Notification Function
+    function showToast(message, type = 'info') {
+      // Remove existing toasts
+      const existingToast = document.querySelector('.toast');
+      if (existingToast) {
+        existingToast.remove();
+      }
+
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      // Show toast
+      setTimeout(() => toast.classList.add('show'), 100);
+
+      // Auto remove after 4 seconds
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    // Form Validation
+    function validateEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+
+    function validatePassword(password) {
+      return password.length >= 6;
+    }
+
+    function clearErrors() {
+      emailInput.classList.remove('error', 'success');
+      passwordInput.classList.remove('error', 'success');
+      emailError.classList.remove('show');
+      passwordError.classList.remove('show');
+      emailError.textContent = '';
+      passwordError.textContent = '';
+    }
+
+    function showError(input, message) {
+      input.classList.add('error');
+      input.classList.remove('success');
+      const errorElement = input.id === 'email' ? emailError : passwordError;
+      errorElement.textContent = message;
+      errorElement.classList.add('show');
+    }
+
+    function showSuccess(input) {
+      input.classList.add('success');
+      input.classList.remove('error');
+      const errorElement = input.id === 'email' ? emailError : passwordError;
+      errorElement.classList.remove('show');
+    }
+
+    // Real-time validation
+    emailInput.addEventListener('input', function() {
+      const email = this.value.trim();
+      if (email === '') {
+        this.classList.remove('error', 'success');
+        emailError.classList.remove('show');
+      } else if (!validateEmail(email)) {
+        showError(this, 'Please enter a valid email address');
+      } else {
+        showSuccess(this);
+      }
+    });
+
+    passwordInput.addEventListener('input', function() {
+      const password = this.value;
+      if (password === '') {
+        this.classList.remove('error', 'success');
+        passwordError.classList.remove('show');
+      } else if (!validatePassword(password)) {
+        showError(this, 'Password must be at least 6 characters');
+      } else {
+        showSuccess(this);
+      }
+    });
+
+    // Password Toggle Functionality
+    passwordToggle.addEventListener('click', function() {
+      const type = passwordInput.type === 'password' ? 'text' : 'password';
+      passwordInput.type = type;
+      this.textContent = type === 'password' ? '👁️' : '🙈';
+    });
+
+    // Enter Key Support
+    loginForm.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleLogin();
+      }
+    });
+
+    // Login Form Submission
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      handleLogin();
+    });
+
+    // Main Login Function
+    async function handleLogin() {
+      clearErrors();
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      let hasErrors = false;
+      if (!email) {
+        showError(emailInput, 'Email is required');
+        hasErrors = true;
+      } else if (!validateEmail(email)) {
+        showError(emailInput, 'Please enter a valid email address');
+        hasErrors = true;
+      }
+      if (!password) {
+        showError(passwordInput, 'Password is required');
+        hasErrors = true;
+      } else if (!validatePassword(password)) {
+        showError(passwordInput, 'Password must be at least 6 characters');
+        hasErrors = true;
+      }
+      if (hasErrors) {
+        showToast('Please fix the errors above', 'error');
+        return;
+      }
+
+      loginBtn.disabled = true;
+      loginBtn.classList.add('loading');
+      loginBtn.textContent = 'Signing In...';
+
+      try {
+        const response = await fetch('http://localhost:3000/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const contentType = response.headers.get('content-type');
+        let data = null;
+
+        if (contentType && contentType.includes('application/json')) {
+          data = await response.json();
+        } else {
+          // Not JSON, probably an error page
+          const text = await response.text();
+          console.error('Non-JSON response:', text);
+          throw new Error('Server did not return JSON. Check if the backend is running and the endpoint is correct.');
+        }
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Login failed');
+        }
+
+        showToast('Login successful! Redirecting...', 'success');
+        // Store user data in localStorage for client-side access
+        localStorage.setItem('user', JSON.stringify(data.user || {}));
+        passwordInput.value = '';
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+
+      } catch (error) {
+        showToast(error.message, 'error');
+        passwordInput.value = '';
+        passwordInput.focus();
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.classList.remove('loading');
+        loginBtn.textContent = 'Sign In';
+      }
+    }
+
+    // Check if user is already logged in
+    window.addEventListener('load', function() {
+      const user = localStorage.getItem('user');
+      const urlParams = new URLSearchParams(window.location.search);
+      const logout = urlParams.get('logout');
+      
+      // If logout parameter is present, clear localStorage and stay on login page
+      if (logout === 'true') {
+        localStorage.removeItem('user');
+        switchUserBtn.style.display = 'none';
+        currentUserInfo.style.display = 'none';
+        return;
+      }
+      
+      if (user) {
+        try {
+          const userData = JSON.parse(user);
+          // Show current user info
+          currentUserInfo.textContent = `Currently logged in as: ${userData.name} (${userData.email})`;
+          currentUserInfo.style.display = 'block';
+          // Show switch user button
+          switchUserBtn.style.display = 'block';
+          switchUserBtn.textContent = 'Switch User / Clear Session';
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          localStorage.removeItem('user');
+        }
+      } else {
+        // Hide switch user button if no user is logged in
+        switchUserBtn.style.display = 'none';
+        currentUserInfo.style.display = 'none';
+      }
+    });
+
+    // Switch User Button
+    switchUserBtn.addEventListener('click', function() {
+      // Clear localStorage and reload page
+      localStorage.removeItem('user');
+      window.location.reload();
+    });
+
+    // Focus on email input when page loads
+    window.addEventListener('load', function() {
+      emailInput.focus();
+    });
+  </script>
+</body>
+</html>

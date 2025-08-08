@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pockit – Settings</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Inter:wght@400;600&family=Montserrat:wght@700&display=swap" rel="stylesheet"/>
+  <script src="js/theme.js"></script>
+  <style>
+    /* Settings-specific styles */
+    .settings-container { display: flex; min-height: 100vh; background: #F9FBF4; }
+    .sidebar { width: 240px; background: #fff; box-shadow: 2px 0 12px rgba(44,62,80,0.04); display: flex; flex-direction: column; align-items: stretch; padding: 0; }
+    .sidebar-header { display: flex; align-items: center; gap: 12px; padding: 32px 24px 24px 24px; }
+    .sidebar-logo { width: 38px; height: 38px; border-radius: 12px; background: linear-gradient(135deg, #00BFFF 60%, #1DE9B6 100%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #fff; font-weight: 700; }
+    .sidebar-title { font-size: 1.35rem; font-weight: 700; color: #00BFFF; font-family: 'Montserrat',sans-serif; }
+    .sidebar-menu { display: flex; flex-direction: column; gap: 4px; margin-top: 32px; }
+    .sidebar-link { display: flex; align-items: center; gap: 12px; padding: 12px 28px; font-size: 1.08rem; color: #2C3E50; text-decoration: none; border-radius: 8px 0 0 8px; font-weight: 500; transition: background 0.15s, color 0.15s; }
+    .sidebar-link.active { background: #E6F7FF; color: #00BFFF; font-weight: 700; }
+    .sidebar-link .icon { font-size: 1.2rem; }
+    .sidebar-link:hover:not(.active) { background: #F2FAFF; color: #00BFFF; }
+    .sidebar-spacer { flex: 1; }
+    .sidebar-logout { margin: 24px 0 24px 0; text-align: center; }
+    .logout-btn { background: #fff; color: #00BFFF; border: 1.5px solid #00BFFF; border-radius: 8px; padding: 8px 24px; font-weight: 600; cursor: pointer; transition: background 0.15s, color 0.15s; }
+    .logout-btn:hover { background: #00BFFF; color: #fff; }
+    
+    /* Main content */
+    .main-content { flex: 1; padding: 36px 36px 24px 36px; }
+    .settings-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+    .settings-title { font-size: 2rem; font-weight: 700; color: #2C3E50; margin: 0; }
+    .back-btn { background: #fff; color: #00BFFF; border: 1.5px solid #00BFFF; border-radius: 8px; padding: 10px 20px; font-weight: 600; cursor: pointer; transition: background 0.15s, color 0.15s; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+    .back-btn:hover { background: #00BFFF; color: #fff; }
+    
+    /* Settings sections */
+    .settings-grid { display: grid; gap: 24px; max-width: 800px; }
+    .settings-card { background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(44,62,80,0.07); padding: 32px; }
+    .settings-card-title { font-size: 1.3rem; font-weight: 700; color: #2C3E50; margin: 0 0 16px 0; display: flex; align-items: center; gap: 12px; }
+    .settings-card-icon { font-size: 1.4rem; }
+    .settings-card-desc { color: #7B8A97; font-size: 1rem; margin-bottom: 24px; }
+    
+    /* Form styles */
+    .settings-form { display: grid; gap: 20px; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    .form-label { font-size: 1rem; font-weight: 600; color: #2C3E50; }
+    .form-input { padding: 12px 16px; border: 1.5px solid #E0E0E0; border-radius: 8px; font-size: 1rem; color: #2C3E50; background: #fff; transition: border-color 0.2s; }
+    .form-input:focus { outline: none; border-color: #00BFFF; }
+    .form-input:disabled { background: #F8F9FA; color: #7B8A97; cursor: not-allowed; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    
+    /* Buttons */
+    .settings-actions { display: flex; gap: 16px; margin-top: 24px; }
+    .btn { padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; font-size: 1rem; }
+    .btn-primary { background: #00BFFF; color: #fff; }
+    .btn-primary:hover { background: #1DE9B6; }
+    .btn-secondary { background: #fff; color: #00BFFF; border: 1.5px solid #00BFFF; }
+    .btn-secondary:hover { background: #F2FAFF; }
+    .btn-danger { background: #FF5A5A; color: #fff; }
+    .btn-danger:hover { background: #FF4444; }
+    
+    /* Toggle switch */
+    .toggle-switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+    .toggle-slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .toggle-slider { background-color: #00BFFF; }
+    input:checked + .toggle-slider:before { transform: translateX(26px); }
+    
+    /* Settings item */
+    .settings-item { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid #F0F0F0; }
+    .settings-item:last-child { border-bottom: none; }
+    .settings-item-info { flex: 1; }
+    .settings-item-title { font-size: 1.1rem; font-weight: 600; color: #2C3E50; margin-bottom: 4px; }
+    .settings-item-desc { font-size: 0.95rem; color: #7B8A97; }
+    
+    /* User Profile Dropdown */
+    .user-profile-dropdown { position: relative; }
+    .dropdown-menu { position: absolute; top: 100%; right: 0; margin-top: 8px; background: #fff; border-radius: 12px; box-shadow: 0 8px 32px rgba(44,62,80,0.12); min-width: 280px; z-index: 1000; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; border: 1px solid #F0F0F0; }
+    .dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
+    .dropdown-header { padding: 20px; display: flex; align-items: center; gap: 12px; }
+    .dropdown-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #00BFFF 60%, #1DE9B6 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; }
+    .dropdown-user-info { flex: 1; }
+    .dropdown-name { font-size: 1.1rem; font-weight: 700; color: #2C3E50; margin-bottom: 4px; }
+    .dropdown-email { font-size: 0.95rem; color: #7B8A97; }
+    .dropdown-divider { height: 1px; background: #F0F0F0; margin: 0; }
+    .dropdown-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: #2C3E50; text-decoration: none; font-size: 1rem; font-weight: 500; transition: background 0.2s; border: none; background: none; width: 100%; text-align: left; cursor: pointer; }
+    .dropdown-item:hover { background: #F8F9FA; color: #00BFFF; }
+    .dropdown-item.logout-item:hover { background: #FFF5F5; color: #FF5A5A; }
+    .dropdown-icon { font-size: 1.1rem; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #0056A8; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: background 0.2s, transform 0.2s; }
+    .user-avatar:hover { background: #004080; transform: scale(1.05); }
+    
+    /* Unified Top Bar Layout */
+    .top-bar { display: flex; align-items: center; justify-content: flex-end; gap: 1rem; margin-right: 2rem; margin-top: 1rem; }
+    .add-btn { background: #00BFFF; color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 1.08rem; padding: 10px 28px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,191,255,0.08); transition: background 0.18s; }
+    .add-btn:hover { background: #1DE9B6; color: #2C3E50; }
+    
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .sidebar { width: 100px; }
+      .sidebar-title { display: none; }
+      .sidebar-link { padding: 12px 10px; font-size: 0.98rem; }
+      .main-content { padding: 24px 8px; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 700px) {
+      .settings-container { flex-direction: column; }
+      .sidebar { width: 100%; flex-direction: row; height: 60px; box-shadow: 0 2px 12px rgba(44,62,80,0.07); }
+      .sidebar-header, .sidebar-spacer, .sidebar-logout { display: none; }
+      .sidebar-menu { flex-direction: row; gap: 0; margin: 0; width: 100%; justify-content: space-around; }
+      .sidebar-link { border-radius: 0; padding: 10px 0; justify-content: center; width: 100%; }
+      .main-content { padding: 12px 2vw; }
+      .settings-card { padding: 24px; }
+      .settings-actions { flex-direction: column; }
+      .dropdown-menu { min-width: 260px; right: -10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="settings-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">P</div>
+        <div class="sidebar-title">Pockit</div>
+      </div>
+      <hr style="border:none;border-top:1.5px solid #F0F0F0;margin:0 18px 0 18px;">
+      <div style="font-size:0.98rem;color:#7B8A97;font-weight:600;padding:18px 0 6px 28px;letter-spacing:0.5px;">Menu</div>
+      <nav class="sidebar-menu">
+        <a href="dashboard.html" class="sidebar-link"><span class="icon">🏠</span>Dashboard</a>
+        <a href="expense.html" class="sidebar-link"><span class="icon">💸</span>Expenses</a>
+        <a href="emi.html" class="sidebar-link"><span class="icon">📅</span>EMI Manager</a>
+        <a href="debt.html" class="sidebar-link"><span class="icon">📊</span>Debt Tracker</a>
+        <a href="savings.html" class="sidebar-link"><span class="icon">🎯</span>Savings Goals</a>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-logout">
+        <button class="logout-btn" onclick="handleLogout()">Logout</button>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <div class="settings-header">
+        <h1 class="settings-title">Settings</h1>
+        <div class="settings-header-right">
+          <div class="top-bar">
+            <div class="user-profile-dropdown">
+              <div class="user-avatar" id="userAvatar" onclick="toggleDropdown()">JD</div>
+              <div class="dropdown-menu" id="dropdownMenu">
+                <div class="dropdown-header">
+                  <div class="dropdown-avatar" id="dropdownAvatar">JD</div>
+                  <div class="dropdown-user-info">
+                    <div class="dropdown-name" id="dropdownName">John Doe</div>
+                    <div class="dropdown-email" id="dropdownEmail">john@example.com</div>
+                  </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                <a href="profile.html" class="dropdown-item">
+                  <span class="dropdown-icon">👤</span>
+                  View Profile
+                </a>
+                <a href="settings.html" class="dropdown-item">
+                  <span class="dropdown-icon">⚙️</span>
+                  Settings
+                </a>
+                <div class="dropdown-divider"></div>
+                <button class="dropdown-item logout-item" onclick="handleLogout()">
+                  <span class="dropdown-icon">🚪</span>
+                  Log out
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Settings Grid -->
+      <div class="settings-grid">
+        <!-- Password Change -->
+        <div class="settings-card">
+          <h2 class="settings-card-title">
+            <span class="settings-card-icon">🔒</span>
+            Change Password
+          </h2>
+          <p class="settings-card-desc">Update your password to keep your account secure</p>
+          
+          <form class="settings-form" id="passwordForm">
+            <div class="form-group">
+              <label class="form-label" for="currentPassword">Current Password</label>
+              <input type="password" id="currentPassword" name="currentPassword" class="form-input" required>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="newPassword">New Password</label>
+                <input type="password" id="newPassword" name="newPassword" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="confirmPassword">Confirm New Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" class="form-input" required>
+              </div>
+            </div>
+            
+            <div class="settings-actions">
+              <button type="submit" class="btn btn-primary">Update Password</button>
+            </div>
+          </form>
+        </div>
+        
+
+        
+        <!-- Notification Settings -->
+        <div class="settings-card">
+          <h2 class="settings-card-title">
+            <span class="settings-card-icon">🔔</span>
+            Notifications
+          </h2>
+          <p class="settings-card-desc">Manage your notification preferences</p>
+          
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-title">Email Notifications</div>
+              <div class="settings-item-desc">Receive updates about your expenses and savings</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="emailNotifications" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-title">Monthly Reports</div>
+              <div class="settings-item-desc">Get monthly financial summaries via email</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="monthlyReports" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <div class="settings-item-title">Savings Reminders</div>
+              <div class="settings-item-desc">Get reminded about your savings goals</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="savingsReminders">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        
+
+        
+        <!-- Danger Zone -->
+        <div class="settings-card">
+          <h2 class="settings-card-title">
+            <span class="settings-card-icon">⚠️</span>
+            Danger Zone
+          </h2>
+          <p class="settings-card-desc">Irreversible actions that will permanently delete your data</p>
+          
+          <div class="settings-actions">
+            <button class="btn btn-danger" onclick="deleteAccount()">Delete Account</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <script>
+    // Dropdown functionality
+    function toggleDropdown() {
+      const dropdown = document.getElementById('dropdownMenu');
+      dropdown.classList.toggle('show');
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+      const dropdown = document.getElementById('dropdownMenu');
+      const avatar = document.getElementById('userAvatar');
+      
+      if (!dropdown.contains(event.target) && !avatar.contains(event.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+
+    // Close dropdown on escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        const dropdown = document.getElementById('dropdownMenu');
+        dropdown.classList.remove('show');
+      }
+    });
+
+    // Logout function
+    async function handleLogout() {
+      try {
+        const response = await fetch('/api/logout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        localStorage.removeItem('user');
+        window.location.href = 'login.html?logout=true';
+      } catch (error) {
+        console.error('Logout error:', error);
+        localStorage.removeItem('user');
+        window.location.href = 'login.html?logout=true';
+      }
+    }
+
+    // Load user data
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (!storedUser) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        let user;
+        try {
+          // First try to get user from localStorage
+          user = JSON.parse(storedUser);
+          
+          // Optionally try to fetch fresh data from server (but don't fail if it doesn't work)
+          try {
+            const res = await fetch('/api/current-user');
+            if (res.ok) {
+              const serverUser = await res.json();
+              // Update localStorage with fresh data
+              localStorage.setItem('user', JSON.stringify(serverUser));
+              user = serverUser;
+            }
+          } catch (serverError) {
+            // If server request fails, continue with localStorage data
+            console.log('Using cached user data');
+          }
+        } catch (parseError) {
+          console.error('Failed to parse stored user data:', parseError);
+          localStorage.removeItem('user');
+          window.location.href = 'login.html';
+          return;
+        }
+
+        // Generate initials
+        const initials = user.name.split(' ').map(n => n[0]).join('');
+        
+        // Update avatars and user info
+        document.getElementById('userAvatar').textContent = initials;
+        document.getElementById('dropdownAvatar').textContent = initials;
+        document.getElementById('dropdownName').textContent = user.name;
+        document.getElementById('dropdownEmail').textContent = user.email;
+
+        // Load saved settings from localStorage
+        loadSettings();
+
+      } catch (err) {
+        console.error('Failed to load user data:', err);
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+      }
+    });
+
+    // Load settings from localStorage
+    function loadSettings() {
+      const settings = JSON.parse(localStorage.getItem('userSettings') || '{}');
+      
+      document.getElementById('emailNotifications').checked = settings.emailNotifications !== false;
+      document.getElementById('monthlyReports').checked = settings.monthlyReports !== false;
+      document.getElementById('savingsReminders').checked = settings.savingsReminders === true;
+
+      
+      // Note: Dark mode toggle is handled by theme.js
+    }
+
+    // Save account settings
+    function saveAccountSettings() {
+      const settings = {
+        emailNotifications: document.getElementById('emailNotifications').checked,
+        monthlyReports: document.getElementById('monthlyReports').checked,
+        savingsReminders: document.getElementById('savingsReminders').checked,
+
+      };
+      
+      localStorage.setItem('userSettings', JSON.stringify(settings));
+      alert('Settings saved successfully!');
+    }
+
+    // Handle password change
+    document.getElementById('passwordForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const passwordData = {
+        currentPassword: formData.get('currentPassword'),
+        newPassword: formData.get('newPassword'),
+        confirmPassword: formData.get('confirmPassword')
+      };
+
+      if (passwordData.newPassword !== passwordData.confirmPassword) {
+        alert('New passwords do not match!');
+        return;
+      }
+
+      if (passwordData.newPassword.length < 6) {
+        alert('New password must be at least 6 characters long!');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/change-password', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(passwordData)
+        });
+
+        if (response.ok) {
+          alert('Password updated successfully!');
+          this.reset();
+        } else {
+          const error = await response.json();
+          alert('Failed to update password: ' + error.message);
+        }
+      } catch (error) {
+        console.error('Password change error:', error);
+        alert('Failed to update password. Please try again.');
+      }
+    });
+
+    // Delete account
+    function deleteAccount() {
+      if (confirm('Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently lost.')) {
+        if (confirm('This is your final warning. All your data will be permanently deleted. Are you absolutely sure?')) {
+          // In a real app, you would call an API to delete the account
+          alert('Account deletion would be implemented here. For now, this is just a demo.');
+        }
+      }
+    }
+
+    // Save settings when toggles change
+    document.getElementById('emailNotifications').addEventListener('change', saveAccountSettings);
+    document.getElementById('monthlyReports').addEventListener('change', saveAccountSettings);
+    document.getElementById('savingsReminders').addEventListener('change', saveAccountSettings);
+
+  </script>
+</body>
+</html> 
